@@ -1,0 +1,8 @@
+*.DS_Store
+*.out
+*.o
+*.elf
+*.hex
+*.vscode
+*.dSYM
+*.deps
