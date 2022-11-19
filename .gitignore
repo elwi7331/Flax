@@ -7,3 +7,4 @@
 *.dSYM
 *.deps
 /test
+/out
