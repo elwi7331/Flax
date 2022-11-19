@@ -54,14 +54,12 @@ int main(void) {
 	/* SPI2CON bit ON = 1; */
 	SPI2CONSET = 0x8000;
 	
+	// display image on screen
+	uint8_t img_data[512];
+	image_to_data(screen_2d, img_data);
 	display_init();
-	// display_string(0, "Hello");
-	// display_string(1, "World");
-	// display_string(2, "Lorem");
-	// display_string(3, "Ipsum");
 	display_update();
-	
-	new_display_image(screen_image);
+	display_image(img_data);
 	
 	labinit(); /* Do any lab-specific initialization */
 

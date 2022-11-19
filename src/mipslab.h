@@ -8,8 +8,8 @@
    For copyright and licensing, see file COPYING */
 
 /* Declare display-related functions from mipslabfunc.c */
-void display_image(int x, const uint8_t *data);
-void new_display_image(const uint8_t *data);
+void image_to_data(uint8_t image[32][128], uint8_t *data);
+void display_image(uint8_t *data);
 void display_init(void);
 void display_string(int line, char *s);
 void display_update(void);
@@ -18,7 +18,6 @@ uint8_t spi_send_recv(uint8_t data);
 /* Declare lab-related functions from mipslabfunc.c */
 char * itoaconv( int num );
 void labwork(void);
-int nextprime( int inval );
 void quicksleep(int cyc);
 void tick( unsigned int * timep );
 
@@ -43,8 +42,7 @@ extern const uint8_t const icon[128];
 /* Declare text buffer for display output */
 extern char textbuffer[4][16];
 
-extern const uint8_t const new_icon[128];
-extern const uint8_t const screen_image[512];
+extern const uint8_t const screen_2d[32][128];
 
 /* Declare functions written by students.
    Note: Since we declare these functions here,
