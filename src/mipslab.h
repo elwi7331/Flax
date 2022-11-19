@@ -43,6 +43,7 @@ extern const uint8_t const icon[128];
 extern char textbuffer[4][16];
 
 extern const uint8_t const screen_2d[32][128];
+extern const uint8_t const screen_2_2d[32][128];
 
 /* Declare functions written by students.
    Note: Since we declare these functions here,
