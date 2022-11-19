@@ -9,6 +9,7 @@
 
 /* Declare display-related functions from mipslabfunc.c */
 void display_image(int x, const uint8_t *data);
+void new_display_image(const uint8_t *data);
 void display_init(void);
 void display_string(int line, char *s);
 void display_update(void);
@@ -41,6 +42,9 @@ extern const uint8_t const font[128*8];
 extern const uint8_t const icon[128];
 /* Declare text buffer for display output */
 extern char textbuffer[4][16];
+
+extern const uint8_t const new_icon[128];
+extern const uint8_t const screen_image[512];
 
 /* Declare functions written by students.
    Note: Since we declare these functions here,

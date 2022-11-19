@@ -80,14 +80,14 @@ void tick( unsigned int * timep )
    repeated calls to display_image; display_image overwrites
    about half of the digits shown by display_debug.
 */   
-void display_debug( volatile int * const addr )
-{
-  display_string( 1, "Addr" );
-  display_string( 2, "Data" );
-  num32asc( &textbuffer[1][6], (int) addr );
-  num32asc( &textbuffer[2][6], *addr );
-  display_update();
-}
+// void display_debug( volatile int * const addr )
+// {
+//   display_string( 1, "Addr" );
+//   display_string( 2, "Data" );
+//   num32asc( &textbuffer[1][6], (int) addr );
+//   num32asc( &textbuffer[2][6], *addr );
+//   display_update();
+// }
 
 uint8_t spi_send_recv(uint8_t data) {
 	while(!(SPI2STAT & 0x08));
@@ -141,6 +141,7 @@ void display_string(int line, char *s) {
 			textbuffer[line][i] = ' ';
 }
 
+// print 32x32 image (data[128]), offset from left (pixels): x
 void display_image(int x, const uint8_t *data) {
 	int i, j;
 	
@@ -160,6 +161,28 @@ void display_image(int x, const uint8_t *data) {
 	}
 }
 
+void new_display_image(const uint8_t *data) {
+	int i, j, offset;
+	
+	offset = 0;
+		for(i = 0; i < 4; i++) {
+			DISPLAY_CHANGE_TO_COMMAND_MODE;
+
+			spi_send_recv(0x22); // set page command
+			spi_send_recv(i); // page number
+			
+			spi_send_recv(offset & 0xF);
+			spi_send_recv(0x10 | ((offset >> 4) & 0xF));
+			
+			DISPLAY_CHANGE_TO_DATA_MODE;
+			
+			for(j = 0; j < 128; j++)
+				spi_send_recv(~data[i*128 + j]);
+		}
+}
+
+// print text to screen?
+// seems to clear the display also...
 void display_update(void) {
 	int i, j, k;
 	int c;

@@ -37,7 +37,7 @@ void user_isr() {
 		IFS(0) &= ~0x800;
 		mytime += 3;
 	}
-	display_image(96, icon);
+	//display_image(96, icon);
 }
 
 /* Lab-specific initialization goes here */
@@ -82,5 +82,5 @@ int timertest() {
 void labwork() {
 	prime = nextprime( prime );
 	display_string( 0, itoaconv( prime ) );
-	display_update();
+	// display_update();
 }
