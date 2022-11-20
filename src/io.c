@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <pic32mx.h>
-#include "mipslab.h"
+#include "boilerplate.h"
 
 int getsw() {
 	return (PORTD >> 8) & 0xf;
