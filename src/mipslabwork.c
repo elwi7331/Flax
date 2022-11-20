@@ -20,8 +20,6 @@ char textstring[] = "text, more text, and even more text!";
 int timeoutcount = 0;
 int prime = 1234567;
 
-int imgcount = 0;
-
 /* Interrupt Service Routine */
 void user_isr() {
 	uint8_t img[512];
@@ -30,15 +28,6 @@ void user_isr() {
 		IFS(0) &= ~0x100;
 
 		if (++timeoutcount == 10) {
-			
-			if ( ++imgcount % 2 == 0) {
-				imgcount = 0;
-				image_to_data(screen_2d, img);
-			} else {
-				image_to_data(screen_2_2d, img);
-			}
-			display_image(img);
-
 			
 			time2string( textstring, mytime );
 			display_string( 3, textstring );

@@ -7,9 +7,11 @@
 
    For copyright and licensing, see file COPYING */
 
-#include <stdint.h>   /* Declarations of uint_32 and the like */
-#include <pic32mx.h>  /* Declarations of system-specific addresses etc */
-#include "mipslab.h"  /* Declatations for these labs */
+#include <stdint.h>  /* Declarations of uint_32 and the like */
+#include <pic32mx.h> /* Declarations of system-specific addresses etc */
+#include "mipslab.h" /* Declatations for these labs */
+#include "game.h"
+#include <string.h>
 
 int main(void) {
         /*
@@ -56,12 +58,24 @@ int main(void) {
 	
 	// display image on screen
 	uint8_t img_data[512];
-	image_to_data(screen_2d, img_data);
-	display_init();
-	display_update();
-	display_image(img_data);
+
+	Flax player;
+	player.x = 10;
+	player.y = 10;
+	player.vel = 0;
+
+	Game game;
+	game.player = player;
+	for ( int y = 0; y < 32; ++y ) {
+		for ( int x = 0; x < 128; ++x ) {
+		game.screen[y][x] = 0;
+		}
+	}
 	
-	labinit(); /* Do any lab-specific initialization */
+	display_init();
+	draw_game(&game);
+	image_to_data(game.screen, img_data);
+	display_image(img_data);
 
 	while( 1 )
 	{
