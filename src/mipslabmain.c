@@ -66,11 +66,7 @@ int main(void) {
 
 	Game game;
 	game.player = player;
-	for ( int y = 0; y < 32; ++y ) {
-		for ( int x = 0; x < 128; ++x ) {
-		game.screen[y][x] = 0;
-		}
-	}
+	memset(game.screen, 0, 4096);
 	
 	display_init();
 	draw_game(&game);
