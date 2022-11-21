@@ -40,7 +40,6 @@ void user_isr() {
 		IFS(0) &= ~0x800;
 		mytime += 3;
 	}
-	//display_image(96, icon);
 }
 
 /* Lab-specific initialization goes here */
@@ -82,7 +81,7 @@ int timertest() {
 }
 
 /* This function is called repetitively from the main program */
-void labwork() {
+void labwork() { // TODO remove
 	// display_update();
 	return;
 }

@@ -40,7 +40,7 @@ void quicksleep(int cyc) {
    3rd pair counts minutes.
    4th pair (least significant byte) counts seconds.
    In most labs, only the 3rd and 4th pairs are used. */
-void tick( unsigned int * timep )
+void tick( unsigned int * timep ) // TODO remove
 {
   /* Get current value, store locally */
   register unsigned int t = * timep;
@@ -234,7 +234,7 @@ void display_update(void) {
 
 /* Helper function, local to this file.
    Converts a number to hexadecimal ASCII digits. */
-static void num32asc( char * s, int n ) 
+static void num32asc( char * s, int n ) // TODO remove
 {
   int i;
   for( i = 28; i >= 0; i -= 4 )

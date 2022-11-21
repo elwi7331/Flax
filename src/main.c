@@ -61,7 +61,7 @@ int main(void) {
 
 	Flax player;
 	player.x = 10;
-	player.y = 10;
+	player.y = 31;
 	player.vel = 0;
 
 	Game game;
@@ -73,9 +73,18 @@ int main(void) {
 	image_to_data(game.screen, img_data);
 	display_image(img_data);
 
-	while( 1 )
-	{
-	  // labwork(); /* Do lab-specific things again and again */
+	while( 1 ) {
+		draw_game(&game);
+		image_to_data(game.screen, img_data);
+		display_image(img_data);
+		
+		perform_gravity(&game.player, 0.01);
+		move_player(&game.player, 0.01);
+
+		quicksleep(0xFFFFFFFF);
+		quicksleep(0xFFFFFFFF);
+		quicksleep(0xFFFFFFFF);
+		quicksleep(0xFFFFFFFF);
 	}
 	return 0;
 }
