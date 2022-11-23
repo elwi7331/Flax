@@ -65,13 +65,23 @@ int main(void) {
 	player.x = 10;
 	player.y = 31;
 	player.vel = 0;
+	
+	PipePair pipe;
+	pipe.upper_edge = 27;
+	pipe.lower_edge = 10;
+	pipe.left_border = 100;
+	pipe.right_border = 104;
+	
+	PipePair pipes[] = {pipe};
 
 	Game game;
 	game.player = player;
+	game.pipes = pipes;
+	game.pipes_len = 1;
 	memset(game.screen, 0, 4096);
 	
 	halted = 1;
-	labinit();
+	io_init();
 
 	display_init();
 	draw_game(&game);
@@ -82,18 +92,16 @@ int main(void) {
 		draw_game(&game);
 		image_to_data(game.screen, img_data);
 		display_image(img_data);
-		
-		perform_gravity(&game.player, dt);
+		update_game(&game, dt);
 		
 		int btn = getbtns();
 		if ((btn & 0b100) == 0b100) { // btn 4
 			jump(&game.player);
 		}
 
-		if ( game.player.y < 5 ) {
+		if ( game.player.y < 1 ) {
 			jump(&game.player);
 		}
-		move_player(&game.player, dt);
 		
 		// wait for timer
 		while ( halted != 0 ) {

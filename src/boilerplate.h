@@ -14,6 +14,7 @@ void display_init(void);
 void display_string(int line, char *s);
 void display_update(void);
 uint8_t spi_send_recv(uint8_t data);
+void io_init();
 
 /* Declare lab-related functions from mipslabfunc.c */
 char * itoaconv( int num );

@@ -34,7 +34,7 @@ void user_isr() {
 }
 
 /* Lab-specific initialization goes here */
-void labinit() {
+void io_init() {
 	// io 
 	TRISE &= ~0xff; // set as outputs
 	PORTE &= ~0xff; // led 7-0 zero
