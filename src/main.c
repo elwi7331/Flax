@@ -67,18 +67,21 @@ int main(void) {
 	player.vel = 0;
 	
 	PipePair pipe;
-	pipe.upper_edge = 27;
-	pipe.lower_edge = 10;
+	pipe.upper_edge = 20;
+	pipe.lower_edge = 2;
 	pipe.left_border = 100;
 	pipe.right_border = 104;
 	
-	PipePair pipes[] = {pipe};
+	PipePair pipes[20] = {pipe};
 
 	Game game;
+	memset(game.screen, 0, 4096);
 	game.player = player;
 	game.pipes = pipes;
 	game.pipes_len = 1;
-	memset(game.screen, 0, 4096);
+	
+	spawn_pipe(game.pipes, &game.pipes_len);
+	
 	
 	halted = 1;
 	io_init();
@@ -87,7 +90,7 @@ int main(void) {
 	draw_game(&game);
 	image_to_data(game.screen, img_data);
 	display_image(img_data);
-
+	
 	while( 1 ) {
 		draw_game(&game);
 		image_to_data(game.screen, img_data);

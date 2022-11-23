@@ -962,7 +962,6 @@
 #define DMACONINV	PIC32_R (0x8300C)
 #define DMASTAT         PIC32_R (0x83010)       /* DMA Status */
 #define DMAADDR         PIC32_R (0x83020)       /* DMA Address */
-// TODO: other DMA registers.
 
 /*--------------------------------------
  * System controller registers.
@@ -1027,7 +1026,6 @@
 #define CHECONCLR	PIC32_R (0x84004)
 #define CHECONSET	PIC32_R (0x84008)
 #define CHECONINV	PIC32_R (0x8400C)
-// TODO: other prefetech registers
 
 /*--------------------------------------
  * Bus matrix control registers.

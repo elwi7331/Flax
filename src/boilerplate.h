@@ -53,6 +53,6 @@ void time2string( char *, int );
 /* Written as part of i/o lab: getbtns, getsw, enable_interrupt */
 int getbtns(void);
 int getsw(void);
-void enable_interruipt(void);
+void enable_interrupt(void);
 
 int halted;

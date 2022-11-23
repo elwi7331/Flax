@@ -47,7 +47,7 @@ void io_init() {
 	T2CON = T2CON & ~0b10; // tcs use internal clock source
 	T2CON = T2CON & ~0x2000; // SIDL 0, stop in idle mode bit, 0: continue operation in idle mode
 	//PR2 = 1250; // set timer period 25 hz
-	PR2 = 12500; // TODO remove
+	PR2 = 12500;
 	TMR2 = 0; // reset counter
 	T2CONSET = 0x8000; // start timer
 

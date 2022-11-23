@@ -30,10 +30,12 @@ typedef struct PipePair PipePair;
 struct Game{
 	Flax player;
 	uint8_t screen[32][128];
-	PipePair pipes;
+	PipePair *pipes;
 	int pipes_len;
 };
 typedef struct Game Game;
 
 void jump(Flax *player);
 void update_game(Game *game, float dt);
+void draw_game(Game *game);
+void spawn_pipe(PipePair *pipes, int *pipes_len);
