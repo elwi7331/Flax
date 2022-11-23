@@ -16,7 +16,7 @@ struct Game{
 };
 typedef struct Game Game;
 
-void jump(Flax *player, float amount);
+void jump(Flax *player);
 void perform_gravity(Flax *player, float dt);
 void move_player(Flax *player, float dt);
 void draw_game(Game *game);

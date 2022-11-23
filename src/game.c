@@ -2,9 +2,11 @@
 #include <string.h>
 #include "game.h"
 
-const float player_vel_limit_down = -10; // TODO set
-const float player_vel_limit_up = 3; // TODO set
-const float player_gravity = -1.1; // TODO set, should be negative
+#define MAX_Y 31
+
+const float player_vel_limit_down = -20; // TODO set
+const float player_jump_vel = 20;
+const float player_gravity = -20.0; // TODO set, should be negative
 
 /* function jump
 update the vertical velocity of player
@@ -16,13 +18,9 @@ will be mutated
 Argument amount: how much the speed should be incremented
 */
 // TODO should this functino set or increment the vel?
-void jump(Flax *player, float amount) {
-	player->vel += amount;
-
-	if ( player->vel > player_vel_limit_up ) {
-		player->vel = player_vel_limit_up;
-	}
-};
+void jump(Flax *player) {
+	player->vel = player_jump_vel;
+}
 
 /* function perform_gravity
 update the vertical velocity of player to simulate gravity
@@ -49,7 +47,14 @@ will be mutated
 Argument dt: time that has passed
 */
 void move_player(Flax *player, float dt) {
-	player->y = player->y + player->vel * dt;
+	float y = player->y + player->vel * dt;
+
+	if ( y < 0 || y > MAX_Y ) {
+		;
+		// TODO handle the player losing
+		// maybe different things happen when hitting ceiling vs floor?
+	}
+	player->y = y;
 };
 
 void draw_player(Flax *player, uint8_t screen[32][128]) {

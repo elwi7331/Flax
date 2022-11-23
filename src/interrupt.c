@@ -17,29 +17,20 @@
 int mytime = 0x5957;
 
 char textstring[] = "text, more text, and even more text!";
-int timeoutcount = 0;
 int prime = 1234567;
 
 /* Interrupt Service Routine */
 void user_isr() {
-	uint8_t img[512];
-
 	if (IFS(0) & 0x100) {
 		IFS(0) &= ~0x100;
-
-		if (++timeoutcount == 10) {
-			
-			time2string( textstring, mytime );
-			display_string( 3, textstring );
-			tick( &mytime );
-			PORTE = ( PORTE + 1 ) & 0xff; // LED increment
-			timeoutcount = 0;
-		}
+		halted = 0;
 	} 
-	if (IFS(0) & 0x800) {
-		IFS(0) &= ~0x800;
-		mytime += 3;
-	}
+
+	// this might be surprise assignment stuff...
+	// if (IFS(0) & 0x800) {
+	// 	IFS(0) &= ~0x800;
+	// 	mytime += 3;
+	// }
 }
 
 /* Lab-specific initialization goes here */
@@ -49,20 +40,21 @@ void labinit() {
 	PORTE &= ~0xff; // led 7-0 zero
 	TRISD |= 0b111111100000; // 11 through 5 input sw
 	// PORTD |= 0b111111100000; // 11 through 5 input instruction says so
-	
+
 	// Enable interrupts for timer2
 
 	T2CON = ( T2CON & ~0b1110000 ) | 0b1110000; // initialize counter with 256 prescaling
 	T2CON = T2CON & ~0b10; // tcs use internal clock source
-	T2CON = T2CON & ~0x2000; // SIDL 0
-	PR2 = 31250; // set timer period
+	T2CON = T2CON & ~0x2000; // SIDL 0, stop in idle mode bit, 0: continue operation in idle mode
+	//PR2 = 1250; // set timer period 25 hz
+	PR2 = 12500; // TODO remove
 	TMR2 = 0; // reset counter
-
 	T2CONSET = 0x8000; // start timer
 
-	IPC(2) = 4;
-	IEC(0) = (1 << 8);
+	IPC(2) = 4; // priority control
+	IEC(0) = (1 << 8); // interrupt enable
 	
+	// TODO wat?
 	// enable interrupts for sw2
 	IEC(0) |= 0b100000000000; // enable
 	IPC(2) = (IPC(2) & 0xE3FFFFFF) | (6 << 26);
@@ -78,10 +70,4 @@ int timertest() {
 	}
 
 	return 0;
-}
-
-/* This function is called repetitively from the main program */
-void labwork() { // TODO remove
-	// display_update();
-	return;
 }

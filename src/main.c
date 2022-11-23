@@ -59,6 +59,8 @@ int main(void) {
 	// display image on screen
 	uint8_t img_data[512];
 
+	float dt = 1.0 / 25.0;
+
 	Flax player;
 	player.x = 10;
 	player.y = 31;
@@ -68,6 +70,9 @@ int main(void) {
 	game.player = player;
 	memset(game.screen, 0, 4096);
 	
+	halted = 1;
+	labinit();
+
 	display_init();
 	draw_game(&game);
 	image_to_data(game.screen, img_data);
@@ -78,13 +83,26 @@ int main(void) {
 		image_to_data(game.screen, img_data);
 		display_image(img_data);
 		
-		perform_gravity(&game.player, 0.01);
-		move_player(&game.player, 0.01);
+		perform_gravity(&game.player, dt);
+		
+		int btn = getbtns();
+		if ((btn & 0b100) == 0b100) { // btn 4
+			jump(&game.player);
+		}
 
-		quicksleep(0xFFFFFFFF);
-		quicksleep(0xFFFFFFFF);
-		quicksleep(0xFFFFFFFF);
-		quicksleep(0xFFFFFFFF);
+		if ( game.player.y < 5 ) {
+			jump(&game.player);
+		}
+		move_player(&game.player, dt);
+		
+		// wait for timer
+		while ( halted != 0 ) {
+			if ( game.player.y < 5 ) {
+				jump(&game.player);
+			}
+		}
+		halted = 1;
+
 	}
 	return 0;
 }
