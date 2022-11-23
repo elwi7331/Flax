@@ -59,8 +59,6 @@ Argument dt: time that has passed
 void move_player(Flax *player, float dt) {
 	float y = player->y + player->vel * dt;
 
-	// TODO Flax shouldn't be able to jump higher than than the screen edge
-
 	if ( y < 0 || y > MAX_Y ) {
 		;
 		// TODO handle the player losing
@@ -74,8 +72,13 @@ void draw_player(Flax *player, uint8_t screen[32][128]) {
 	uint8_t y = MAX_Y - (uint8_t) player->y; // low indexes are top of screen
 
 	screen[y][x] = 1;
-	screen[y-1][x+1] = 1;
-	screen[y-1][x-1] = 1;
+	if ( player->vel < 0 ) { // TODO is it trying to draw too big/small indexes?
+		screen[y-1][x+1] = 1;
+		screen[y-1][x-1] = 1;
+	} else {
+		screen[y+1][x+1] = 1;
+		screen[y+1][x-1] = 1;
+	}
 };
 
 /*
@@ -83,7 +86,7 @@ Generate two random numbers, and create a pipe out of that information.
 One number for the gap between the pipes,
 and one number for the height of the lower pipe
 */
-void spawn_pipe(PipePair *pipes, int *pipes_len) {
+void spawn_pipe(PipePair *pipes, int *pipes_len) { // TODO seed random...
 	int lower = PIPE_MIN_LOWER + rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER);
 	int upper = MAX_Y - rand() % ( MAX_Y - lower - PIPE_MIN_GAP);
 
