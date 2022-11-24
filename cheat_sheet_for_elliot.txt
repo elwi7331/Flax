@@ -1,2 +1,0 @@
-ls /dev/tty.*
-make install TTYDEV=/dev/ttyUSB0
