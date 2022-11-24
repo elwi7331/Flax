@@ -59,12 +59,14 @@ Argument dt: time that has passed
 void move_player(Flax *player, float dt) {
 	float y = player->y + player->vel * dt;
 
-	if ( y < 0 || y > MAX_Y ) {
-		;
-		// TODO handle the player losing
-		// maybe different things happen when hitting ceiling vs floor?
+	if ( y > (float) (MAX_Y)) {
+		player->y = MAX_Y;
+		player->vel = 0;
+	} else if ( y < 0 ) {
+		; // TODO die
+	} else {
+		player->y = y;
 	}
-	player->y = y;
 };
 
 void draw_player(Flax *player, uint8_t screen[32][128]) {
@@ -116,10 +118,10 @@ void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 
 void draw_pipes(PipePair *pipes, int pipes_len, uint8_t screen[32][128]) {
 	for (int i=0; i<pipes_len; ++i) {
-		uint8_t left = (uint8_t) pipes[i].left_border;
-		uint8_t right = (uint8_t) pipes[i].right_border;
-		uint8_t upper = MAX_Y - (uint8_t) pipes[i].upper_edge;
-		uint8_t lower = MAX_Y - (uint8_t) pipes[i].lower_edge;
+		int left = (int) pipes[i].left_border;
+		int right = (int) pipes[i].right_border;
+		int upper = MAX_Y - (uint8_t) pipes[i].upper_edge;
+		int lower = MAX_Y - (uint8_t) pipes[i].lower_edge;
 
 		// draw pipe borders
 		for (int y=0; y<MAX_Y; ++y) {

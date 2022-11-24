@@ -72,13 +72,13 @@ int main(void) {
 	pipe.left_border = 100;
 	pipe.right_border = 104;
 	
-	PipePair pipes[20] = {pipe};
 
 	Game game;
 	memset(game.screen, 0, 4096);
 	game.player = player;
-	game.pipes = pipes;
+	game.pipes[0] = pipe;
 	game.pipes_len = 1;
+	game.state = Playing;
 	
 	spawn_pipe(game.pipes, &game.pipes_len);
 	

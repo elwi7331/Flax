@@ -3,6 +3,14 @@
 */
 #include <stdint.h>
 
+enum GameState {
+	MainMenu,
+	HighScoreMenu,
+	Playing,
+	GameOver 
+};
+typedef enum GameState GameState;
+
 struct Flax {
 	float x;
 	float y;
@@ -27,10 +35,11 @@ struct PipePair {
 };
 typedef struct PipePair PipePair;
 
-struct Game{
+struct Game {
+	GameState state;
 	Flax player;
 	uint8_t screen[32][128];
-	PipePair *pipes;
+	PipePair pipes[20];
 	int pipes_len;
 };
 typedef struct Game Game;
