@@ -98,6 +98,15 @@ void spawn_pipe(PipePair *pipes, int *pipes_len) { // TODO seed random...
 	pipes[*pipes_len-1] = pair;
 }
 
+/* function move_pipes
+move all pipes given speed and time passed
+also delete the first pipe if it is out of frame
+
+args:
+	PipePair *pipes: array pointing to the pipes
+	int *pipes_len: len of the array
+	float dt: the time that has passed
+*/
 void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 	for (int i=0; i < *pipes_len; ++i) {
 		pipes[i].left_border += pipe_speed * dt;
@@ -164,6 +173,7 @@ int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
 	return 0;
 }
 
+// used in update_game for determining when to update highscore
 int passed_pipe = 0;
 /* function update_game
 updates the game state.
@@ -179,7 +189,7 @@ int update_game(Game *game, float dt) {
 	move_player(&game->player, dt);
 	move_pipes(game->pipes, &game->pipes_len, dt);
 	if (flax_hits_pipe(game->player, game->pipes, game->pipes_len)) {
-		game->state = GameOver;
+		return 1;
 	} else if ( game->player.y < 0 ) {
 		game->player.y = 0;
 		return 1;
@@ -192,6 +202,15 @@ int update_game(Game *game, float dt) {
 		passed_pipe = 1;
 	}
 	return 0;
+}
+
+void set_default_game_state(Game *game) {
+	game->player.x = PLAYER_START_X;
+	game->player.y = PLAYER_START_Y;
+	game->player.vel = 0;
+	game->pipes_len = 0;
+	game->score = 0;
+	memset(game->screen, 0, 4096);
 }
 
 void draw_game(Game *game) {
