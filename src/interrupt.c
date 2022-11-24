@@ -14,26 +14,15 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "boilerplate.h"  /* Declatations for these labs */
 
-int mytime = 0x5957;
-
-char textstring[] = "text, more text, and even more text!";
-int prime = 1234567;
-
 /* Interrupt Service Routine */
 void user_isr() {
 	if (IFS(0) & 0x100) {
 		IFS(0) &= ~0x100;
 		halted = 0;
 	} 
-
-	// this might be surprise assignment stuff...
-	// if (IFS(0) & 0x800) {
-	// 	IFS(0) &= ~0x800;
-	// 	mytime += 3;
-	// }
 }
 
-/* Lab-specific initialization goes here */
+/* IO initialization */
 void io_init() {
 	// io 
 	TRISE &= ~0xff; // set as outputs
