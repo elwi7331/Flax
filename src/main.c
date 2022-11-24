@@ -95,27 +95,27 @@ int main(void) {
 	display_image(img_data);
 	
 	while( 1 ) {
+		update_game(&game, dt);
 		draw_game(&game);
 		image_to_data(game.screen, img_data);
 		display_image(img_data);
-		update_game(&game, dt);
-		
-		if (btn_is_pressed(4)) {
-			jump(&game.player);
-		}
 
-		if ( game.player.y < 1 ) {
-			jump(&game.player);
+		if (game.pipes[game.pipes_len-1].right_border < MAX_X - 20 ) {
+			spawn_pipe(game.pipes, &game.pipes_len);
 		}
+		
 		
 		// wait for timer
 		while ( halted != 0 ) {
-			if ( game.player.y < 5 ) {
-				jump(&game.player);
+			if (btn_is_pressed(4)) {
+			jump(&game.player);
 			}
 		}
 		halted = 1;
 
+		if ( game.state == GameOver ) {
+			while (1) {}
+		}
 	}
 	return 0;
 }

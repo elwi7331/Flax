@@ -3,6 +3,9 @@
 */
 #include <stdint.h>
 
+#define MAX_Y 31
+#define MAX_X 127
+
 enum GameState {
 	MainMenu,
 	HighScoreMenu,

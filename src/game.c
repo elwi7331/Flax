@@ -3,8 +3,6 @@
 #include "game.h"
 #include <stdlib.h>
 
-#define MAX_Y 31
-#define MAX_X 127
 
 #define PIPE_MIN_LOWER 3
 #define PIPE_MAX_LOWER 20
@@ -62,8 +60,6 @@ void move_player(Flax *player, float dt) {
 	if ( y > (float) (MAX_Y)) {
 		player->y = MAX_Y;
 		player->vel = 0;
-	} else if ( y < 0 ) {
-		; // TODO die
 	} else {
 		player->y = y;
 	}
@@ -145,10 +141,39 @@ void draw_pipes(PipePair *pipes, int pipes_len, uint8_t screen[32][128]) {
 	}
 }
 
+/*function flax_hits_pipe
+returns 1 if the player has hit one of the pipes,
+otherwise false.
+
+Flax hitbox is 3x1:
+--------
+--xxx---
+--------
+
+None of the arguments is mutated
+*/
+int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
+	for ( int i = 0; i < pipes_len; ++i ) {
+		if (
+			(player.y < pipe[i].lower_edge+1 || player.y > pipe[i].upper_edge-1) 
+			&& (player.x - 1 < pipe[i].right_border+1 && player.x + 1 > pipe[i].left_border-1)
+		) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 void update_game(Game *game, float dt) {
 	perform_gravity(&game->player, dt);
 	move_player(&game->player, dt);
 	move_pipes(game->pipes, &game->pipes_len, dt);
+	if (flax_hits_pipe(game->player, game->pipes, game->pipes_len)) {
+		game->state = GameOver;
+	} else if ( game->player.y < 0 ) {
+		game->player.y = 0;
+		game->state = GameOver;
+	}
 }
 
 void draw_game(Game *game) {
