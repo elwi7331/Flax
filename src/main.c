@@ -13,8 +13,8 @@
 #include "game.h"
 #include <string.h>
 
-int main(void) {
-        /*
+void setup(void) {
+	/*
 	  This will set the peripheral bus clock to the same frequency
 	  as the sysclock. That means 80 MHz, when the microcontroller
 	  is running at 80 MHz. Changed 2017, as recommended by Axel.
@@ -50,11 +50,15 @@ int main(void) {
 	/* SPI2STAT bit SPIROV = 0; */
 	SPI2STATCLR = 0x40;
 	/* SPI2CON bit CKP = 1; */
-        SPI2CONSET = 0x40;
+	SPI2CONSET = 0x40;
 	/* SPI2CON bit MSTEN = 1; */
 	SPI2CONSET = 0x20;
 	/* SPI2CON bit ON = 1; */
 	SPI2CONSET = 0x8000;
+}
+
+int main(void) {
+	setup();
 	
 	// display image on screen
 	uint8_t img_data[512];
@@ -79,9 +83,8 @@ int main(void) {
 	game.pipes[0] = pipe;
 	game.pipes_len = 1;
 	game.state = Playing;
-	
+
 	spawn_pipe(game.pipes, &game.pipes_len);
-	
 	
 	halted = 1;
 	io_init();
@@ -97,8 +100,7 @@ int main(void) {
 		display_image(img_data);
 		update_game(&game, dt);
 		
-		int btn = getbtns();
-		if ((btn & 0b100) == 0b100) { // btn 4
+		if (btn_is_pressed(4)) {
 			jump(&game.player);
 		}
 

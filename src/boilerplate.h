@@ -44,7 +44,7 @@ extern char textbuffer[4][16];
    specified in the laboratory instructions. */
 /* Written as part of asm lab: delay, time2string */
 /* Written as part of i/o lab: getbtns, getsw, enable_interrupt */
-int getbtns(void);
+int btn_is_pressed(int);
 int getsw(void);
 void enable_interrupt(void);
 
