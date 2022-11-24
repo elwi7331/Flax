@@ -164,6 +164,7 @@ int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
 	return 0;
 }
 
+int passed_pipe = 0;
 void update_game(Game *game, float dt) {
 	perform_gravity(&game->player, dt);
 	move_player(&game->player, dt);
@@ -174,6 +175,15 @@ void update_game(Game *game, float dt) {
 		game->player.y = 0;
 		game->state = GameOver;
 	}
+
+	if (game->player.x > game->pipes[0].left_border && game->player.x < game->pipes[0].right_border) {
+		passed_pipe = 0;
+	} else if ( game->pipes[0].right_border < game->player.x && passed_pipe == 0) {
+		game->score++;
+		passed_pipe = 1;
+	}
+
+
 }
 
 void draw_game(Game *game) {

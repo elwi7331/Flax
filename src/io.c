@@ -76,3 +76,7 @@ int btn_is_pressed(int btn) {
 		return ((btns & 0b100) == 0b100 );
 	};
 }
+
+void write_led(uint8_t num) {
+	PORTE = num;
+}

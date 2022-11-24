@@ -47,5 +47,6 @@ extern char textbuffer[4][16];
 int btn_is_pressed(int);
 int getsw(void);
 void enable_interrupt(void);
+void write_led(uint8_t num);
 
 int halted;

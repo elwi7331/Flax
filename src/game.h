@@ -44,6 +44,7 @@ struct Game {
 	uint8_t screen[32][128];
 	PipePair pipes[20];
 	int pipes_len;
+	uint8_t score;
 };
 typedef struct Game Game;
 

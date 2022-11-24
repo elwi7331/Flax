@@ -83,6 +83,7 @@ int main(void) {
 	game.pipes[0] = pipe;
 	game.pipes_len = 1;
 	game.state = Playing;
+	game.score = 0;
 
 	spawn_pipe(game.pipes, &game.pipes_len);
 	
@@ -99,6 +100,7 @@ int main(void) {
 		draw_game(&game);
 		image_to_data(game.screen, img_data);
 		display_image(img_data);
+		write_led(game.score);
 
 		if (game.pipes[game.pipes_len-1].right_border < MAX_X - 20 ) {
 			spawn_pipe(game.pipes, &game.pipes_len);
