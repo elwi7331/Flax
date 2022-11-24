@@ -48,5 +48,6 @@ int btn_is_pressed(int);
 int getsw(void);
 void enable_interrupt(void);
 void write_led(uint8_t num);
+void set_timer_period(uint16_t period);
 
 int halted;

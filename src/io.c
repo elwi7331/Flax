@@ -22,7 +22,10 @@ void user_isr() {
 	} 
 }
 
-/* IO initialization */
+/*IO initialization 
+note that this function initializes the timer, but not the timer period.
+This is up to the developer to do, using set_timer_period
+*/
 void io_init() {
 	// io 
 	TRISE &= ~0xff; // set as outputs
@@ -35,8 +38,7 @@ void io_init() {
 	T2CON = ( T2CON & ~0b1110000 ) | 0b1110000; // initialize counter with 256 prescaling
 	T2CON = T2CON & ~0b10; // tcs use internal clock source
 	T2CON = T2CON & ~0x2000; // SIDL 0, stop in idle mode bit, 0: continue operation in idle mode
-	//PR2 = 1250; // set timer period 25 hz
-	PR2 = 12500;
+
 	TMR2 = 0; // reset counter
 	T2CONSET = 0x8000; // start timer
 
@@ -50,6 +52,13 @@ void io_init() {
 	IPC(2) = (IPC(2) & 0xFAFFFFFF) | (1 << 24); 
 
 	enable_interrupt();
+}
+
+/* function set_timer_period
+set period of the built in timer pr2.
+*/
+void set_timer_period(uint16_t period) {
+	PR2 = period;
 }
 
 int getsw() {
@@ -72,8 +81,12 @@ int timertest() {
 int btn_is_pressed(int btn) {
 	int btns = getbtns();
 	switch (btn) {
+		case 2:
+			return ( (btns & 0b001) == 0b001 );
+		case 3:
+			return ( (btns & 0b010) == 0b010 );
 		case 4:
-		return ((btns & 0b100) == 0b100 );
+			return ( (btns & 0b100) == 0b100 );
 	};
 }
 

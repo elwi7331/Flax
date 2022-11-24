@@ -3,6 +3,9 @@
 */
 #include <stdint.h>
 
+#define GAME_TIME_PERIOD 12500
+#define MENU_TIME_PERIOD 65535
+
 #define MAX_Y 31
 #define MAX_X 127
 
@@ -49,6 +52,6 @@ struct Game {
 typedef struct Game Game;
 
 void jump(Flax *player);
-void update_game(Game *game, float dt);
+int update_game(Game *game, float dt);
 void draw_game(Game *game);
 void spawn_pipe(PipePair *pipes, int *pipes_len);

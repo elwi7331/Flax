@@ -57,17 +57,26 @@ void setup(void) {
 	SPI2CONSET = 0x8000;
 }
 
+// global variables for entering highscore information
+char player_name[9] = "_       \0";
+int ch_idx = 0;
+
 int main(void) {
 	setup();
+
+	set_timer_period(MENU_TIME_PERIOD);
 	
+	int playing;
+
 	// display image on screen
 	uint8_t img_data[512];
 
+	// time between frames
 	float dt = 1.0 / 25.0;
 
 	Flax player;
 	player.x = 10;
-	player.y = 31;
+	player.y = 16;
 	player.vel = 0;
 	
 	PipePair pipe;
@@ -82,7 +91,7 @@ int main(void) {
 	game.player = player;
 	game.pipes[0] = pipe;
 	game.pipes_len = 1;
-	game.state = Playing;
+	game.state = MainMenu;
 	game.score = 0;
 
 	spawn_pipe(game.pipes, &game.pipes_len);
@@ -91,33 +100,116 @@ int main(void) {
 	io_init();
 
 	display_init();
-	draw_game(&game);
-	image_to_data(game.screen, img_data);
-	display_image(img_data);
+	// draw_game(&game);
+	// image_to_data(game.screen, img_data);
+	// display_image(img_data);
+	
+	int btn2 = 0;
+	int btn3 = 0;
+	int btn4 = 0;
 	
 	while( 1 ) {
-		update_game(&game, dt);
-		draw_game(&game);
-		image_to_data(game.screen, img_data);
-		display_image(img_data);
-		write_led(game.score);
 
-		if (game.pipes[game.pipes_len-1].right_border < MAX_X - 20 ) {
-			spawn_pipe(game.pipes, &game.pipes_len);
+		switch(game.state) {
+			case MainMenu:
+				display_string(0, "    ^ Flax ^");
+				display_string(1, "");
+				display_string(2, "BTN4 > play");
+				display_string(3, "BTN3 > scores");
+				display_update();
+				
+				if ( btn4 ) {
+					set_timer_period(GAME_TIME_PERIOD);
+					game.state = Playing;
+				} else if ( btn3 ) {
+					game.state = HighScoreMenu;
+				}
+
+				break;
+
+			case Playing:
+				playing = update_game(&game, dt);
+				draw_game(&game);
+				image_to_data(game.screen, img_data);
+				display_image(img_data);
+				write_led(game.score);
+
+				if (game.pipes[game.pipes_len-1].right_border < MAX_X - 20 ) {
+					spawn_pipe(game.pipes, &game.pipes_len);
+				}
+				
+				if ( btn4 ) {
+					jump(&game.player);
+				}
+
+				if (playing == 1) {
+					game.state = GameOver;
+					set_timer_period(MENU_TIME_PERIOD);
+				}
+
+				break;
+
+
+			case GameOver:
+				display_string(0, "   Enter name");
+				display_string(1, player_name);
+				display_string(2, "btn 2  3   4");
+				display_string(3, "   ch  >  menu");
+				display_update();
+
+				if ( btn2 ) {
+					player_name[ch_idx]++;
+					
+					if ( player_name[ch_idx] == '_'+1) {
+						player_name[ch_idx] = 'A';
+					} else if ( player_name[ch_idx] > 90 ) {
+						player_name[ch_idx] = '_';
+					}
+				}
+				
+				if ( btn3 ) {
+					if (player_name[ch_idx] == '_') {
+						player_name[ch_idx] = ' ';
+					} else {
+						player_name[ch_idx] += 32;
+					}
+
+					++ch_idx;
+					if ( ch_idx > 7 ) {
+						ch_idx = 0;
+					}
+					
+					if (player_name[ch_idx] == ' ') {
+						player_name[ch_idx] = '_';
+					} else {
+						player_name[ch_idx] -= 32;
+					}
+				}
+
+				if ( btn4 ) {
+					game.state = MainMenu;
+				}
+
+				break;
+
+			case HighScoreMenu:
+				display_string(0, "   Highscores");
+				display_string(1, "");
+				display_string(2, "");
+				display_string(3, "");
+
+				display_update();
+
+
+				break;
 		}
-		
-		
 		// wait for timer
 		while ( halted != 0 ) {
-			if (btn_is_pressed(4)) {
-			jump(&game.player);
-			}
+			btn2 = btn_is_pressed(2);
+			btn3 = btn_is_pressed(3);
+			btn4 = btn_is_pressed(4);
 		}
 		halted = 1;
-
-		if ( game.state == GameOver ) {
-			while (1) {}
-		}
 	}
 	return 0;
 }
