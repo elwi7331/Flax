@@ -3,7 +3,6 @@
 #include "game.h"
 #include <stdlib.h>
 
-
 #define PIPE_MIN_LOWER 3
 #define PIPE_MAX_LOWER 20
 #define PIPE_MIN_GAP 10
@@ -70,7 +69,7 @@ void draw_player(Flax *player, uint8_t screen[32][128]) {
 	uint8_t y = MAX_Y - (uint8_t) player->y; // low indexes are top of screen
 
 	screen[y][x] = 1;
-	if ( player->vel < 0 ) { // TODO is it trying to draw too big/small indexes?
+	if ( player->vel < 0 ) {
 		screen[y-1][x+1] = 1;
 		screen[y-1][x-1] = 1;
 	} else {
@@ -79,7 +78,7 @@ void draw_player(Flax *player, uint8_t screen[32][128]) {
 	}
 };
 
-/*
+/* function spawn_pipe
 Generate two random numbers, and create a pipe out of that information.
 One number for the gap between the pipes,
 and one number for the height of the lower pipe
@@ -150,7 +149,7 @@ void draw_pipes(PipePair *pipes, int pipes_len, uint8_t screen[32][128]) {
 	}
 }
 
-/*function flax_hits_pipe
+/* function flax_hits_pipe
 returns 1 if the player has hit one of the pipes,
 otherwise false.
 
@@ -159,7 +158,7 @@ Flax hitbox is 3x1:
 --xxx---
 --------
 
-None of the arguments is mutated
+None of the arguments are mutated
 */
 int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
 	for ( int i = 0; i < pipes_len; ++i ) {
@@ -175,9 +174,9 @@ int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
 
 // used in update_game for determining when to update highscore
 int passed_pipe = 0;
+
 /* function update_game
 updates the game state.
-
 args:
 	Game *game,
 	flaot dt (time passsed),

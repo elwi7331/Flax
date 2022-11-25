@@ -76,24 +76,25 @@ int light = 0;
 
 int main(void) {
 
-// --------------
+	// some highscores ----
 	highscores[0].score = 10;
 	memcpy(highscores[0].name, &"elliot  ", 9);
 	++highscore_len;
 	
 	highscores[1].score = 20;
-	memcpy(highscores[1].name, &"Hugo    ", 9);
+	memcpy(highscores[1].name, &"hugo    ", 9);
 	++highscore_len;
 	
 	highscores[2].score = 20;
-	memcpy(highscores[2].name, &"Birger  ", 9);
+	memcpy(highscores[2].name, &"birger  ", 9);
 	++highscore_len;
 
 	qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
-// -------------
-
+	// --------------------
 
 	setup();
+	io_init();
+	display_init();
 
 	set_timer_period(MENU_TIME_PERIOD);
 	
@@ -110,16 +111,12 @@ int main(void) {
 	game.state = MainMenu;
 	
 	halted = 1;
-	io_init();
-
-	display_init();
 	
 	int btn2 = 0;
 	int btn3 = 0;
 	int btn4 = 0;
 	
 	while( 1 ) {
-
 		switch(game.state) {
 			case MainMenu:
 				display_string(0, "    ^ Flax ^");
@@ -158,7 +155,6 @@ int main(void) {
 				}
 
 				break;
-
 
 			case GameOver:
 				display_string(0, "   Enter name");
@@ -216,7 +212,6 @@ int main(void) {
 						qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
 					}
 
-					// Reset game values
 					set_default_game_state(&game);
 
 					game.state = MainMenu;
@@ -234,7 +229,10 @@ int main(void) {
 					} else if ( strlen(highscores[highscores_idx+i].name) == 0 ) {
 						snprintf(buffer, 15, "%02d", highscores_idx+i+1);
 					} else {
-						snprintf(buffer, 15, "%02d %s %d", highscores_idx+i+1, highscores[highscores_idx+i].name, highscores[highscores_idx+i].score);
+						snprintf(
+							buffer, 15, "%02d %s %d", 
+							highscores_idx+i+1, highscores[highscores_idx+i].name, highscores[highscores_idx+i].score
+						);
 					}
 					display_string(i+1, buffer);
 				}
@@ -242,7 +240,6 @@ int main(void) {
 				display_update(light);
 
 				if ( btn2 ) {
-					// highscores_idx = (highscores_idx + 3) % HIGHSCORES_LEN;
 					highscores_idx += 3;
 					if ( highscores_idx >= HIGHSCORES_LEN ) {
 						highscores_idx = 0;
@@ -252,6 +249,7 @@ int main(void) {
 				} else if ( btn4 ) {
 					game.state = MainMenu;
 				}
+				
 				break;
 		}
 		// wait for timer

@@ -14,7 +14,6 @@
 
 #define PIPE_START_X 40
 #define PIPE_SPACING 20
-
 #define PIPES_CAPACITY 20
 
 #define HIGHSCORES_LEN 20

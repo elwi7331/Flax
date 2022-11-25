@@ -198,7 +198,7 @@ void display_update(int light) {
 				if ( light == 1 ) {
 					spi_send_recv(~font[c*8 + k]);
 				} else {
-				spi_send_recv(font[c*8 + k]);
+					spi_send_recv(font[c*8 + k]);
 				}
 
 			}

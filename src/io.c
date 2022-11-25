@@ -32,8 +32,7 @@ void io_init() {
 	PORTE &= ~0xff; // led 7-0 zero
 	TRISD |= 0b111111100000; // 11 through 5 input sw
 
-	// Enable interrupts for timer2
-
+	// setup for timer2
 	T2CON = ( T2CON & ~0b1110000 ) | 0b1110000; // initialize counter with 256 prescaling
 	T2CON = T2CON & ~0b10; // tcs use internal clock source
 	T2CON = T2CON & ~0x2000; // SIDL 0, stop in idle mode bit, 0: continue operation in idle mode
