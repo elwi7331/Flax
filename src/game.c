@@ -84,15 +84,15 @@ Generate two random numbers, and create a pipe out of that information.
 One number for the gap between the pipes,
 and one number for the height of the lower pipe
 */
-void spawn_pipe(PipePair *pipes, int *pipes_len) { // TODO seed random...
+void spawn_pipe(PipePair *pipes, int *pipes_len, int x) { // TODO seed random...
 	int lower = PIPE_MIN_LOWER + rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER);
 	int upper = MAX_Y - rand() % ( MAX_Y - lower - PIPE_MIN_GAP);
 
 	PipePair pair;
 	pair.upper_edge = upper;
 	pair.lower_edge = lower;
-	pair.left_border = MAX_X;
-	pair.right_border = MAX_X + PIPE_WIDTH - 1;
+	pair.left_border = x;
+	pair.right_border = x + PIPE_WIDTH - 1;
 	
 	*pipes_len += 1;
 	pipes[*pipes_len-1] = pair;
@@ -210,6 +210,11 @@ void set_default_game_state(Game *game) {
 	game->player.vel = 0;
 	game->pipes_len = 0;
 	game->score = 0;
+
+	for ( int i = 0; i < 4; ++i ) {
+		spawn_pipe(game->pipes, &game->pipes_len, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
+	}
+
 	memset(game->screen, 0, 4096);
 }
 

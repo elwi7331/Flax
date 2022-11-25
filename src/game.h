@@ -12,7 +12,12 @@
 #define PLAYER_START_X 10
 #define PLAYER_START_Y 16
 
+#define PIPE_START_X 40
+#define PIPE_SPACING 20
+
 #define PIPES_CAPACITY 20
+
+#define HIGHSCORES_LEN 20
 
 enum GameState {
 	MainMenu,
@@ -65,5 +70,5 @@ typedef struct Highscore Highscore;
 void jump(Flax *player);
 int update_game(Game *game, float dt);
 void draw_game(Game *game);
-void spawn_pipe(PipePair *pipes, int *pipes_len);
+void spawn_pipe(PipePair *pipes, int *pipes_len, int x);
 void set_default_game_state(Game *game);

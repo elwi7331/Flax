@@ -13,6 +13,8 @@
 #include "game.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 void setup(void) {
 	/*
@@ -66,13 +68,11 @@ int highscore_cmp(const void *a, const void *b) {
 char player_name[9] = "_       \0";
 int ch_idx = 0;
 
-Highscore highscores[20];
+Highscore highscores[HIGHSCORES_LEN];
 int highscore_len = 0;
+int highscores_idx = 0;
 
 int light = 0;
-
-
-int highscores_idx = 0;
 
 int main(void) {
 
@@ -105,36 +105,14 @@ int main(void) {
 	// time between frames
 	float dt = 1.0 / 25.0;
 
-	// Flax player;
-	// player.x = 10;
-	// player.y = 16;
-	// player.vel = 0;
-	
-	PipePair pipe;
-	pipe.upper_edge = 20;
-	pipe.lower_edge = 2;
-	pipe.left_border = 100;
-	pipe.right_border = 104;
-	
-
 	Game game;
 	set_default_game_state(&game);
-	// memset(game.screen, 0, 4096);
-	// game.player = player;
-	// game.score = 0;
-	game.pipes[0] = pipe;
-	game.pipes_len = 1;
 	game.state = MainMenu;
-
-	spawn_pipe(game.pipes, &game.pipes_len);
 	
 	halted = 1;
 	io_init();
 
 	display_init();
-	// draw_game(&game);
-	// image_to_data(game.screen, img_data);
-	// display_image(img_data);
 	
 	int btn2 = 0;
 	int btn3 = 0;
@@ -166,8 +144,8 @@ int main(void) {
 				display_image(img_data);
 				write_led(game.score);
 
-				if ( game.pipes[game.pipes_len-1].right_border < MAX_X - 20 ) {
-					spawn_pipe(game.pipes, &game.pipes_len);
+				if ( game.pipes[game.pipes_len-1].right_border < MAX_X - PIPE_SPACING ) {
+					spawn_pipe(game.pipes, &game.pipes_len, MAX_X);
 				}
 				
 				if ( btn4 ) {
@@ -247,25 +225,32 @@ int main(void) {
 				break;
 
 			case HighScoreMenu:
-				
-				
 				display_string(0, "   Highscores");
-				for ( int i = 0; i < 3; ++i ) {
-					display_string(i+1, highscores[highscores_idx+i].name);
+				for ( int i = 0; i < 3 && highscores_idx + i < HIGHSCORES_LEN+1; ++i ) {
+					char buffer[15];
+					if (highscores_idx+i >= HIGHSCORES_LEN ) {
+						buffer[0] = ' ';
+						buffer[1] = '\0';
+					} else if ( strlen(highscores[highscores_idx+i].name) == 0 ) {
+						snprintf(buffer, 15, "%02d", highscores_idx+i+1);
+					} else {
+						snprintf(buffer, 15, "%02d %s %d", highscores_idx+i+1, highscores[highscores_idx+i].name, highscores[highscores_idx+i].score);
+					}
+					display_string(i+1, buffer);
 				}
-
-				// display_string(1, "");
-				// display_string(2, "");
-				// display_string(3, "");
 
 				display_update(light);
 
 				if ( btn2 ) {
-					++highscores_idx;
-				} else if ( btn3 ) {
-					--highscores_idx;
+					// highscores_idx = (highscores_idx + 3) % HIGHSCORES_LEN;
+					highscores_idx += 3;
+					if ( highscores_idx >= HIGHSCORES_LEN ) {
+						highscores_idx = 0;
+					}
+				} else if ( btn3 && highscores_idx > 0 ) {
+					highscores_idx -= 3;
 				} else if ( btn4 ) {
-					;
+					game.state = MainMenu;
 				}
 				break;
 		}
@@ -276,8 +261,6 @@ int main(void) {
 			btn4 = btn_is_pressed(4);
 			
 			light = sw_is_toggled(1);
-
-			
 		}
 		halted = 1;
 	}
