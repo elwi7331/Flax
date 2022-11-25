@@ -31,7 +31,6 @@ void io_init() {
 	TRISE &= ~0xff; // set as outputs
 	PORTE &= ~0xff; // led 7-0 zero
 	TRISD |= 0b111111100000; // 11 through 5 input sw
-	// PORTD |= 0b111111100000; // 11 through 5 input instruction says so
 
 	// Enable interrupts for timer2
 

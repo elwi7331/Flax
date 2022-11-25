@@ -116,7 +116,7 @@ void display_string(int line, char *s) {
 	data: this is were the result is stored. 512 length,
 	elements are bytes representing 8 pixels each.
 */
-void image_to_data(uint8_t image[32][128], uint8_t *data) {
+void image_to_data(uint8_t image[32][128], uint8_t *data, int light) {
 	int x, y;
 	uint8_t byte;
 	
@@ -132,6 +132,10 @@ void image_to_data(uint8_t image[32][128], uint8_t *data) {
 			byte |= image[y*8+6][x] << 6;
 			byte |= image[y*8+7][x] << 7;
 			
+			if (light == 1) {
+				byte = ~byte;
+			}
+
 			data[y*128+x] = byte;
 		}
 	}

@@ -69,7 +69,7 @@ int ch_idx = 0;
 Highscore highscores[20];
 int highscore_len = 0;
 
-
+int light = 0;
 
 
 int highscores_idx = 0;
@@ -162,7 +162,7 @@ int main(void) {
 			case Playing:
 				dead = update_game(&game, dt);
 				draw_game(&game);
-				image_to_data(game.screen, img_data);
+				image_to_data(game.screen, img_data, light);
 				display_image(img_data);
 				write_led(game.score);
 
