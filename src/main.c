@@ -148,7 +148,7 @@ int main(void) {
 				display_string(1, "");
 				display_string(2, "BTN4 > play");
 				display_string(3, "BTN3 > scores");
-				display_update();
+				display_update(light);
 				
 				if ( btn4 ) {
 					set_timer_period(GAME_TIME_PERIOD);
@@ -187,7 +187,7 @@ int main(void) {
 				display_string(1, player_name);
 				display_string(2, "btn 2  3   4");
 				display_string(3, "   ch  >  menu");
-				display_update();
+				display_update(light);
 
 				if ( btn2 ) {
 					player_name[ch_idx]++;
@@ -258,7 +258,7 @@ int main(void) {
 				// display_string(2, "");
 				// display_string(3, "");
 
-				display_update();
+				display_update(light);
 
 				if ( btn2 ) {
 					++highscores_idx;
@@ -274,6 +274,10 @@ int main(void) {
 			btn2 = btn_is_pressed(2);
 			btn3 = btn_is_pressed(3);
 			btn4 = btn_is_pressed(4);
+			
+			light = sw_is_toggled(1);
+
+			
 		}
 		halted = 1;
 	}

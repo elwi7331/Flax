@@ -8,11 +8,11 @@
    For copyright and licensing, see file COPYING */
 
 /* Declare display-related functions from mipslabfunc.c */
-void image_to_data(uint8_t image[32][128], uint8_t *data);
+void image_to_data(uint8_t image[32][128], uint8_t *data, int light);
 void display_image(uint8_t *data);
 void display_init(void);
 void display_string(int line, char *s);
-void display_update(void);
+void display_update(int light);
 uint8_t spi_send_recv(uint8_t data);
 void io_init();
 
@@ -44,6 +44,7 @@ extern char textbuffer[4][16];
    specified in the laboratory instructions. */
 /* Written as part of asm lab: delay, time2string */
 /* Written as part of i/o lab: getbtns, getsw, enable_interrupt */
+int sw_is_toggled(int);
 int btn_is_pressed(int);
 int getsw(void);
 void enable_interrupt(void);

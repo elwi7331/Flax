@@ -89,6 +89,20 @@ int btn_is_pressed(int btn) {
 	};
 }
 
+int sw_is_toggled(int sw) {
+	int swtchs = getsw();
+	switch (sw) {
+		case 1:
+			return ( (swtchs & 0b0001) == 0b0001 );
+		case 2:
+			return ( (swtchs & 0b0010) == 0b0010 );
+		case 3:
+			return ( (swtchs & 0b0100) == 0b0100 );
+		case 4:
+			return ( (swtchs & 0b1000) == 0b1000 );
+	}
+}
+
 void write_led(uint8_t num) {
 	PORTE = num;
 }

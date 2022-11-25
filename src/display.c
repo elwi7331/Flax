@@ -51,7 +51,7 @@ void display_debug( volatile int * const addr )
   display_string( 2, "Data" );
   num32asc( &textbuffer[1][6], (int) addr );
   num32asc( &textbuffer[2][6], *addr );
-  display_update();
+  display_update(0);
 }
 
 uint8_t spi_send_recv(uint8_t data) {
@@ -176,7 +176,7 @@ void display_image(uint8_t *data) {
 
 // print text to screen
 // seems to clear the display also...
-void display_update(void) {
+void display_update(int light) {
 	int i, j, k;
 	int c;
 	for(i = 0; i < 4; i++) {
@@ -194,8 +194,14 @@ void display_update(void) {
 			if(c & 0x80)
 				continue;
 			
-			for(k = 0; k < 8; k++)
+			for(k = 0; k < 8; k++) {
+				if ( light == 1 ) {
+					spi_send_recv(~font[c*8 + k]);
+				} else {
 				spi_send_recv(font[c*8 + k]);
+				}
+
+			}
 		}
 	}
 }
