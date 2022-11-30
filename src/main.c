@@ -152,12 +152,12 @@ int main(void) {
 				if ( dead == 1 ) {
 					if ( game.score == 0 ) {
 						game.state = MainMenu;
+						set_default_game_state(&game);
 					} else {
 						game.state = GameOver;
 					}
 
 					set_timer_period(MENU_TIME_PERIOD);
-					set_default_game_state(&game);
 				}
 
 				break;
@@ -205,6 +205,8 @@ int main(void) {
 						player_name[ch_idx] += 32;
 					}
 
+					ch_idx = 0;
+
 					int updated = 0;
 					for ( int i = 0; i < highscore_len; ++i ) {
 						if ( strcmp(highscores[i].name, player_name) == 0 ) {
@@ -225,8 +227,10 @@ int main(void) {
 						qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
 					}
 
-					strcpy(player_name, &"_      \0");
+					strcpy(player_name, (const char*) &"_      \0");
 
+					set_default_game_state(&game);
+					write_led(0);
 					game.state = MainMenu;
 				}
 
