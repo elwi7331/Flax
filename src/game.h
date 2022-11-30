@@ -14,10 +14,30 @@
 
 #define PIPE_START_X 40
 #define PIPE_SPACING 20
-
 #define PIPES_CAPACITY 20
 
 #define HIGHSCORES_LEN 20
+
+#define DEFAULT_DYNAMIC_PIPE_SPEED 3
+
+enum PipeMovementType {
+	Static,
+	Squeezing,
+	Uniform
+};
+typedef enum PipeMovementType PipeMovementType;
+
+/* enum Direction
+Used for telling which direction pipes are currently moving (vertically)
+*/
+enum Direction {
+	In,
+	Out,
+	Up,
+	Down,
+	Still
+};
+typedef enum Direction Direction;
 
 enum GameState {
 	MainMenu,
@@ -43,11 +63,28 @@ typedef struct Flax Flax;
    left_border
          right_border
 */
+// struct PipePair {
+// 	float left_border;
+// 	float right_border;
+// 	float upper_edge;
+// 	float lower_edge;
+// };
+// typedef struct PipePair PipePair;
+
 struct PipePair {
-	float left_border;
-	float right_border;
-	float upper_edge;
-	float lower_edge;
+	float left;
+	float right;
+	float upper;
+	float lower;
+
+	float upper_upper;
+	float upper_lower;
+	float lower_upper;
+	float lower_lower;
+
+	PipeMovementType movement_type;
+	Direction direction;
+	float speed;
 };
 typedef struct PipePair PipePair;
 

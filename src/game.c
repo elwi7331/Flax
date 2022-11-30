@@ -85,17 +85,27 @@ One number for the gap between the pipes,
 and one number for the height of the lower pipe
 */
 void spawn_pipe(PipePair *pipes, int *pipes_len, int x) { // TODO seed random...
-	int lower = PIPE_MIN_LOWER + rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER);
-	int upper = MAX_Y - rand() % ( MAX_Y - lower - PIPE_MIN_GAP);
+	// int lower = PIPE_MIN_LOWER + rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER);
+	// int upper = MAX_Y - rand() % ( MAX_Y - lower - PIPE_MIN_GAP);
 
 	PipePair pair;
-	pair.upper_edge = upper;
-	pair.lower_edge = lower;
-	pair.left_border = x;
-	pair.right_border = x + PIPE_WIDTH - 1;
-	
+	pair.upper_upper = 24;
+	pair.upper_lower = 20;
+	pair.lower_upper = 10;
+	pair.lower_lower = 6;
+
+	pair.direction = Up;
+	pair.movement_type = Uniform;
+
+	pair.upper = pair.upper_lower;
+	pair.lower = pair.lower_lower;
+	pair.left = x;
+	pair.right = x + PIPE_WIDTH - 1;
+	pair.speed = DEFAULT_DYNAMIC_PIPE_SPEED;
+
 	*pipes_len += 1;
 	pipes[*pipes_len-1] = pair;
+
 }
 
 /* function move_pipes
@@ -107,13 +117,62 @@ args:
 	int *pipes_len: len of the array
 	float dt: the time that has passed
 */
+//void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
+//	for (int i=0; i < *pipes_len; ++i) {
+//		pipes[i].left_border += pipe_speed * dt;
+//		pipes[i].right_border += pipe_speed * dt;
+//	}
+//	
+//	if ( pipes[0].right_border < 0 ) { // remove first pipe (out of frame) 
+//		for ( int i = 0; i < *pipes_len-1; ++i ) {
+//			pipes[i] = pipes[i+1];
+//		}
+//		*pipes_len -= 1;
+//	}
+//}
+
 void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 	for (int i=0; i < *pipes_len; ++i) {
-		pipes[i].left_border += pipe_speed * dt;
-		pipes[i].right_border += pipe_speed * dt;
+		// vertical movement
+		
+		switch ( pipes[i].movement_type ) {
+			case Squeezing:
+				if ( pipes[i].lower < pipes[i].lower_lower ) pipes[i].direction = In;
+				if ( pipes[i].lower > pipes[i].lower_upper ) pipes[i].direction = Out;
+
+				if ( pipes[i].direction == In ) {
+					pipes[i].upper -= pipes[i].speed * dt;
+					pipes[i].lower += pipes[i].speed * dt;
+				} else {
+					pipes[i].upper += pipes[i].speed * dt;
+					pipes[i].lower -= pipes[i].speed * dt;
+				}
+			break;
+			
+			case Uniform:
+				if ( pipes[i].lower < pipes[i].lower_lower ) pipes[i].direction = Up;
+				if ( pipes[i].lower > pipes[i].lower_upper ) pipes[i].direction = Down;
+				
+				if ( pipes[i].direction == Up ) {
+					pipes[i].upper += pipes[i].speed * dt;
+					pipes[i].lower += pipes[i].speed * dt;
+				} else {
+					pipes[i].upper -= pipes[i].speed * dt;
+					pipes[i].lower -= pipes[i].speed * dt;
+				}
+			break;
+			
+			case Static:
+				;
+			break;
+		}
+
+		// horizontal movement
+		pipes[i].left+= pipe_speed * dt;
+		pipes[i].right+= pipe_speed * dt;
 	}
 	
-	if ( pipes[0].right_border < 0 ) { // remove first pipe (out of frame) 
+	if ( pipes[0].right < 0 ) { // remove first pipe (out of frame) 
 		for ( int i = 0; i < *pipes_len-1; ++i ) {
 			pipes[i] = pipes[i+1];
 		}
@@ -123,10 +182,10 @@ void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 
 void draw_pipes(PipePair *pipes, int pipes_len, uint8_t screen[32][128]) {
 	for (int i=0; i<pipes_len; ++i) {
-		int left = (int) pipes[i].left_border;
-		int right = (int) pipes[i].right_border;
-		int upper = MAX_Y - (uint8_t) pipes[i].upper_edge;
-		int lower = MAX_Y - (uint8_t) pipes[i].lower_edge;
+		int left = (int) pipes[i].left;
+		int right = (int) pipes[i].right;
+		int upper = MAX_Y - (uint8_t) pipes[i].upper;
+		int lower = MAX_Y - (uint8_t) pipes[i].lower;
 
 		// draw pipe borders
 		for (int y=0; y<MAX_Y; ++y) {
@@ -164,8 +223,8 @@ None of the arguments is mutated
 int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
 	for ( int i = 0; i < pipes_len; ++i ) {
 		if (
-			(player.y < pipe[i].lower_edge+1 || player.y > pipe[i].upper_edge-1) 
-			&& (player.x - 1 < pipe[i].right_border+1 && player.x + 1 > pipe[i].left_border-1)
+			(player.y < pipe[i].lower+1 || player.y > pipe[i].upper-1) 
+			&& (player.x - 1 < pipe[i].right+1 && player.x + 1 > pipe[i].left-1)
 		) {
 			return 1;
 		}
@@ -195,9 +254,9 @@ int update_game(Game *game, float dt) {
 		return 1;
 	}
 
-	if (game->player.x > game->pipes[0].left_border && game->player.x < game->pipes[0].right_border) {
+	if (game->player.x > game->pipes[0].left && game->player.x < game->pipes[0].right) {
 		passed_pipe = 0;
-	} else if ( game->pipes[0].right_border < game->player.x && passed_pipe == 0) {
+	} else if ( game->pipes[0].right < game->player.x && passed_pipe == 0) {
 		game->score++;
 		passed_pipe = 1;
 	}
