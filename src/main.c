@@ -199,8 +199,9 @@ int main(void) {
 				}
 
 				if ( btn4 ) {
-					// fix upper case letter
-					if ( player_name[ch_idx] >= 65 && player_name[ch_idx] <= 90 ) {
+					if ( player_name[ch_idx] == '_' ) {
+						player_name[ch_idx] = ' ';
+					} else if ( player_name[ch_idx] >= 65 && player_name[ch_idx] <= 90 ) { // fix upper case letter
 						player_name[ch_idx] += 32;
 					}
 
