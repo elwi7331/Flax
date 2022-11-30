@@ -4,9 +4,11 @@
 #include <stdlib.h>
 
 
-#define PIPE_MIN_LOWER 3
-#define PIPE_MAX_LOWER 20
 #define PIPE_MIN_GAP 10
+#define PIPE_MAX_GAP 26
+#define PIPE_MIN_LOWER 2
+#define PIPE_MAX_LOWER 20
+#define PIPE_MAX_UPPER 30
 #define PIPE_WIDTH 5
 
 const float player_vel_limit_down = -20;
@@ -80,28 +82,58 @@ void draw_player(Flax *player, uint8_t screen[32][128]) {
 };
 
 /*
-Generate two random numbers, and create a pipe out of that information.
-One number for the gap between the pipes,
-and one number for the height of the lower pipe
+Generate random numbers, and create a pipe out of that information.
+
+Args:
+	*pipes: array containing the pipes
+	*pipes_len: can be modified
+	movement_type: type of pipe
+	speed: only applicable for non static movement type
+	x: the x coordinate of the left side of the pipe
 */
-void spawn_pipe(PipePair *pipes, int *pipes_len, int x) { // TODO seed random...
-	// int lower = PIPE_MIN_LOWER + rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER);
-	// int upper = MAX_Y - rand() % ( MAX_Y - lower - PIPE_MIN_GAP);
-
+void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type, float speed, int x) { // TODO seed random...
 	PipePair pair;
-	pair.upper_upper = 24;
-	pair.upper_lower = 20;
-	pair.lower_upper = 10;
-	pair.lower_lower = 6;
-
-	pair.direction = Up;
-	pair.movement_type = Uniform;
-
-	pair.upper = pair.upper_lower;
-	pair.lower = pair.lower_lower;
 	pair.left = x;
 	pair.right = x + PIPE_WIDTH - 1;
-	pair.speed = DEFAULT_DYNAMIC_PIPE_SPEED;
+	pair.speed = speed;
+	pair.movement_type = movement_type;
+	
+	switch ( movement_type ) {
+		case Uniform:
+			pair.upper_upper = 24;
+			pair.upper_lower = 20;
+			pair.lower_upper = 10;
+			pair.lower_lower = 6;
+
+			pair.direction = Up;
+
+			pair.upper = pair.upper_lower;
+			pair.lower = pair.lower_lower;
+		break;
+
+		case Squeezing:
+			if ( rand() % 2  == 0 ) {
+				pair.direction = In;
+			} else {
+				pair.direction = Out;
+			}
+			pair.upper_upper = 24;
+			pair.upper_lower = 20;
+			pair.lower_upper = 10;
+			pair.lower_lower = 6;
+
+			pair.direction = In;
+
+			pair.upper = pair.upper_upper;
+			pair.lower = pair.lower_lower;
+		break;
+
+		case Static:
+			pair.lower = PIPE_MIN_LOWER + rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER);
+			pair.upper = pair.lower + PIPE_MIN_GAP + rand() % (PIPE_MAX_UPPER - (int) pair.lower - PIPE_MIN_GAP);
+			pair.direction = Still; // this does nothing
+		break;
+	}
 
 	*pipes_len += 1;
 	pipes[*pipes_len-1] = pair;
@@ -271,7 +303,7 @@ void set_default_game_state(Game *game) {
 	game->score = 0;
 
 	for ( int i = 0; i < 4; ++i ) {
-		spawn_pipe(game->pipes, &game->pipes_len, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
+		spawn_pipe(game->pipes, &game->pipes_len, Static, DEFAULT_DYNAMIC_PIPE_SPEED, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
 	}
 
 	memset(game->screen, 0, 4096);
