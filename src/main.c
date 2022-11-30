@@ -150,8 +150,14 @@ int main(void) {
 				}
 
 				if ( dead == 1 ) {
-					game.state = GameOver;
+					if ( game.score == 0 ) {
+						game.state = MainMenu;
+					} else {
+						game.state = GameOver;
+					}
+
 					set_timer_period(MENU_TIME_PERIOD);
+					set_default_game_state(&game);
 				}
 
 				break;
@@ -160,7 +166,7 @@ int main(void) {
 				display_string(0, "   Enter name");
 				display_string(1, player_name);
 				display_string(2, "btn 4  3   2");
-				display_string(3, " menu  >   ch");
+				display_string(3, "  menu >   ch");
 				display_update(light);
 
 				if ( btn2 ) {
@@ -218,7 +224,7 @@ int main(void) {
 						qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
 					}
 
-					set_default_game_state(&game);
+					strcpy(player_name, &"_      \0");
 
 					game.state = MainMenu;
 				}
