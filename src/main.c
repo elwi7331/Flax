@@ -65,7 +65,7 @@ int highscore_cmp(const void *a, const void *b) {
 }
 
 // global variables for entering highscore information
-char player_name[9] = "_       \0";
+char player_name[PLAYER_NAME_LEN] = "_      \0";
 int ch_idx = 0;
 
 Highscore highscores[HIGHSCORES_LEN];
@@ -78,15 +78,15 @@ int main(void) {
 
 	// some highscores ----
 	highscores[0].score = 10;
-	memcpy(highscores[0].name, &"elliot  ", 9);
+	memcpy(highscores[0].name, &"elliot ", PLAYER_NAME_LEN);
 	++highscore_len;
 	
 	highscores[1].score = 20;
-	memcpy(highscores[1].name, &"hugo    ", 9);
+	memcpy(highscores[1].name, &"hugo   ", PLAYER_NAME_LEN);
 	++highscore_len;
 	
 	highscores[2].score = 20;
-	memcpy(highscores[2].name, &"birger  ", 9);
+	memcpy(highscores[2].name, &"birger ", PLAYER_NAME_LEN);
 	++highscore_len;
 
 	qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
@@ -159,8 +159,8 @@ int main(void) {
 			case GameOver:
 				display_string(0, "   Enter name");
 				display_string(1, player_name);
-				display_string(2, "btn 2  3   4");
-				display_string(3, "   ch  >  menu");
+				display_string(2, "btn 4  3   2");
+				display_string(3, " menu  >   ch");
 				display_update(light);
 
 				if ( btn2 ) {
@@ -181,7 +181,7 @@ int main(void) {
 					}
 
 					++ch_idx;
-					if ( ch_idx > 7 ) {
+					if ( ch_idx > PLAYER_NAME_LEN - 2 ) {
 						ch_idx = 0;
 					}
 					
@@ -193,9 +193,15 @@ int main(void) {
 				}
 
 				if ( btn4 ) {
+					// fix upper case letter
+					if ( player_name[ch_idx] >= 65 && player_name[ch_idx] <= 90 ) {
+						player_name[ch_idx] += 32;
+					}
+
 					int updated = 0;
 					for ( int i = 0; i < highscore_len; ++i ) {
 						if ( strcmp(highscores[i].name, player_name) == 0 ) {
+							// update existing highscore
 							if ( game.score > highscores[i].score ) {
 								highscores[i].score = game.score;
 								qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
@@ -230,7 +236,7 @@ int main(void) {
 						snprintf(buffer, 15, "%02d", highscores_idx+i+1);
 					} else {
 						snprintf(
-							buffer, 15, "%02d %s %d", 
+							buffer, 15, "%02d %s %03d",
 							highscores_idx+i+1, highscores[highscores_idx+i].name, highscores[highscores_idx+i].score
 						);
 					}

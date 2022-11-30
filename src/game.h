@@ -17,6 +17,7 @@
 #define PIPES_CAPACITY 20
 
 #define HIGHSCORES_LEN 20
+#define PLAYER_NAME_LEN 8
 
 enum GameState {
 	MainMenu,
