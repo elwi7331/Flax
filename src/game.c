@@ -4,11 +4,11 @@
 #include <stdlib.h>
 
 
-#define PIPE_MIN_GAP 10
+#define PIPE_MIN_GAP 9
 #define PIPE_MAX_GAP 26
 #define PIPE_MIN_LOWER 2
-#define PIPE_MAX_LOWER 20
-#define PIPE_MAX_UPPER 30
+#define PIPE_MAX_LOWER 18
+#define PIPE_MAX_UPPER 29
 #define PIPE_WIDTH 5
 
 const float player_vel_limit_down = -20;
@@ -100,32 +100,61 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 	
 	switch ( movement_type ) {
 		case Uniform:
-			pair.upper_upper = 24;
-			pair.upper_lower = 20;
-			pair.lower_upper = 10;
-			pair.lower_lower = 6;
+			// pair.upper_upper = 24;
+			// pair.upper_lower = 20;
+			// pair.lower_upper = 10;
+			// pair.lower_lower = 6;
 
-			pair.direction = Up;
+			// range [4, 18]
+			pair.lower_upper = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER + 2;
+			// range [2, 16]
+			pair.lower_lower = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER;
 
-			pair.upper = pair.upper_lower;
-			pair.lower = pair.lower_lower;
+			// range [lower_upper + PIPE_MIN_GAP, 27]
+			pair.upper_lower = rand() % (MAX_Y - (int) pair.lower_upper - PIPE_MIN_GAP - PIPE_MIN_LOWER + 1 - 2) + (int) pair.lower_upper + PIPE_MIN_GAP;
+
+			// range [upper_lower + 2, 29]
+			pair.upper_upper = rand() % (MAX_Y - PIPE_MIN_LOWER - (int) pair.upper_lower + 1 - 2) + pair.upper_lower + 2;
+
+			// spawn in upper or lower position
+			if ( rand() % 2 == 0 ) {
+				pair.upper = pair.upper_upper;
+				pair.lower = pair.lower_upper;
+				pair.direction = Down;
+			} else {
+				pair.upper = pair.upper_lower;
+				pair.lower = pair.lower_lower;
+				pair.direction = Up;
+			}
+
 		break;
 
 		case Squeezing:
-			if ( rand() % 2  == 0 ) {
-				pair.direction = In;
-			} else {
+			// pair.upper_upper = 24;
+			// pair.upper_lower = 20;
+			// pair.lower_upper = 10;
+			// pair.lower_lower = 6;
+
+			int max_lower = (MAX_Y - PIPE_MIN_GAP) / 2;
+
+
+			pair.lower_upper = rand() % (max_lower - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER + 2;
+			pair.upper_lower = MAX_Y - pair.lower_upper;
+
+			pair.lower_lower = rand() % ((int) pair.lower_upper - PIPE_MIN_LOWER + 1) + PIPE_MIN_LOWER;
+			pair.upper_upper = MAX_Y - pair.lower_lower;
+
+			// spawn in inner or outer position
+			if ( rand() % 2 == 0 ) {
+				pair.upper = pair.upper_lower;
+				pair.lower = pair.lower_upper;
 				pair.direction = Out;
+			} else {
+				pair.upper = pair.upper_upper;
+				pair.lower = pair.lower_lower;
+				pair.direction = In;
 			}
-			pair.upper_upper = 24;
-			pair.upper_lower = 20;
-			pair.lower_upper = 10;
-			pair.lower_lower = 6;
 
-			pair.direction = In;
-
-			pair.upper = pair.upper_upper;
-			pair.lower = pair.lower_lower;
 		break;
 
 		case Static:
@@ -137,7 +166,6 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 
 	*pipes_len += 1;
 	pipes[*pipes_len-1] = pair;
-
 }
 
 /* function move_pipes
@@ -149,20 +177,6 @@ args:
 	int *pipes_len: len of the array
 	float dt: the time that has passed
 */
-//void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
-//	for (int i=0; i < *pipes_len; ++i) {
-//		pipes[i].left_border += pipe_speed * dt;
-//		pipes[i].right_border += pipe_speed * dt;
-//	}
-//	
-//	if ( pipes[0].right_border < 0 ) { // remove first pipe (out of frame) 
-//		for ( int i = 0; i < *pipes_len-1; ++i ) {
-//			pipes[i] = pipes[i+1];
-//		}
-//		*pipes_len -= 1;
-//	}
-//}
-
 void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 	for (int i=0; i < *pipes_len; ++i) {
 		// vertical movement
