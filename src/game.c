@@ -110,11 +110,10 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 			// range [2, 16]
 			pair.lower_lower = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER;
 
-			// range [lower_upper + PIPE_MIN_GAP, 27]
-			pair.upper_lower = rand() % (MAX_Y - (int) pair.lower_upper - PIPE_MIN_GAP - PIPE_MIN_LOWER + 1 - 2) + (int) pair.lower_upper + PIPE_MIN_GAP;
-
-			// range [upper_lower + 2, 29]
-			pair.upper_upper = rand() % (MAX_Y - PIPE_MIN_LOWER - (int) pair.upper_lower + 1 - 2) + pair.upper_lower + 2;
+			// range [lower_upper + PIPE_MIN_GAP, 29]
+			pair.upper_upper = rand() % (MAX_Y - (int) pair.lower_upper - PIPE_MIN_GAP - PIPE_MIN_LOWER + 1) + (int) pair.lower_upper + PIPE_MIN_GAP;
+			// same movement range as lower pipe
+			pair.upper_lower = pair.upper_upper - (pair.lower_upper - pair.lower_lower);
 
 			// spawn in upper or lower position
 			if ( rand() % 2 == 0 ) {
