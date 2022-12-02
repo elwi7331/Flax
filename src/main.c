@@ -12,11 +12,12 @@
 #include "boilerplate.h" /* Declatations for these labs */
 #include "game.h"
 #include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <stdlib.h> // srand
+#include <stdio.h> // snprintf
 #include <string.h>
 
-void setup(void) {
+/* Various setup */
+void setup( void ) {
 	/*
 	  This will set the peripheral bus clock to the same frequency
 	  as the sysclock. That means 80 MHz, when the microcontroller
@@ -60,26 +61,46 @@ void setup(void) {
 	SPI2CONSET = 0x8000;
 }
 
+/**
+* Compares two highscores based on the score value
+* to sort in descending order
+* @param a should point to struct of Highscore type
+* @param b should point to struct of Highscore type
+*/
 int highscore_cmp(const void *a, const void *b) {
 	return ((Highscore *) b)->score - ((Highscore *)a)->score;
 }
 
-// global variables for entering highscore information
-char player_name[PLAYER_NAME_LEN] = "_      ";
-int ch_idx = 0;
 
-Highscore highscores[HIGHSCORES_LEN];
-int highscore_len = 0;
-int highscores_idx = 0;
+/* Main function */
+int main( void ) {
+	// variables for entering highscore information
+	char player_name[PLAYER_NAME_LEN] = "_      ";
+	int ch_idx = 0;
+	Highscore highscores[HIGHSCORES_LEN];
+	int highscore_len = 0;
+	int highscores_idx = 0;
+	memset(highscores, 0, HIGHSCORES_LEN*sizeof(Highscore));
 
-int light = 0;
+	// boolean values for whether button is pressed or not
+	int btn2 = 0, btn3 = 0, btn4 = 0;
 
-int main(void) {
+	// boolean value for dark/light mode
+	int light = 0;
+	// boolean value telling whether player is alive or not
+	int dead;
+	// Buffer for rendering to screen
+	uint8_t img_data[512];
+	// game time passed between frames
+	float dt = 1.0 / 25.0;
+	// counting time passed before user input, used for srand()
 	uint32_t seed_counter = 0;
 
-	// rand_seed(1337);
+	Game game;
+	game.state = StartMenu;
 
-	// some highscores ----
+	// dummy highscores ------------------------------------------------
+	// ----------------------------------------------------------------
 	highscores[0].score = 10;
 	memcpy(highscores[0].name, &"elliot ", PLAYER_NAME_LEN);
 	++highscore_len;
@@ -93,30 +114,16 @@ int main(void) {
 	++highscore_len;
 
 	qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
-	// --------------------
+	// ----------------------------------------------------------------
+	// ----------------------------------------------------------------
 
+	// general initialization
 	setup();
 	io_init();
 	display_init();
-
 	set_timer_period(MENU_TIME_PERIOD);
-	
-	int dead;
-
-	// display image on screen
-	uint8_t img_data[512];
-
-	// time between frames
-	float dt = 1.0 / 25.0;
-
-	Game game;
-	game.state = StartMenu;
-	
+	// set global variable for telling if game is waiting for delay
 	halted = 1;
-	
-	int btn2 = 0;
-	int btn3 = 0;
-	int btn4 = 0;
 	
 	while( 1 ) {
 		switch(game.state) {
@@ -250,10 +257,11 @@ int main(void) {
 						qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
 					}
 
+					// reset values for the next game
 					memcpy(player_name, (const char*) &"_      ", PLAYER_NAME_LEN);
-
 					set_default_game_state(&game);
 					write_led(0);
+
 					game.state = MainMenu;
 				}
 
@@ -264,8 +272,8 @@ int main(void) {
 				for ( int i = 0; i < 3 && highscores_idx + i < HIGHSCORES_LEN+1; ++i ) {
 					char buffer[15];
 					if (highscores_idx+i >= HIGHSCORES_LEN ) {
-						buffer[0] = ' ';
-						buffer[1] = '\0';
+						memcpy(buffer, "              ", 14);
+						buffer[15] = '\0';
 					} else if ( strlen(highscores[highscores_idx+i].name) == 0 ) {
 						snprintf(buffer, 15, "%02d", highscores_idx+i+1);
 					} else {

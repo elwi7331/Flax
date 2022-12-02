@@ -2,8 +2,6 @@
 #include <string.h>
 #include "game.h"
 #include <stdlib.h>
-#include "random.h"
-
 
 #define PIPE_MIN_GAP 9
 #define PIPE_MAX_GAP 26
@@ -17,35 +15,38 @@ const float player_jump_vel = 12;
 const float player_gravity = -20.0;
 const float pipe_speed = - 3;
 
-// make stdlib work...
-void *stdout = (void *) 0;
+void *stdout = (void*) 0; // is needed when stdio is not included
+int passed_pipe = 0; // used in update_game for determining when to update highscore
 
+
+/**
+ * @brief Returns a random number within given range (inclusive)
+ * 
+ * @param lower the lower bound
+ * @param upper the upper bound (inclusive)
+ * @return uint32_t random number
+ */
 uint32_t randrng(uint32_t lower, uint32_t upper) {
 	return lower + rand() % (upper - lower + 1);
 }
 
-/* function jump
-update the vertical velocity of player
-vel = amount
-
-Argument player: the instance of Flax representing the player,
-will be mutated
-
-Argument amount: how much the speed should be 
-*/
+/**
+ * @brief Makes Flax jump by setting his
+ * velocity to a specific value
+ * 
+ * @param player Flax will be mutated
+ */
 void jump(Flax *player) {
 	player->vel = player_jump_vel;
 }
 
-/* function perform_gravity
-update the vertical velocity of player to simulate gravity
-
-Argument player: the instance of Flax representing the player,
-will be mutated
-
-argument dt: how much time has passed since this function was last
-called. Will probably be "game time" between frames
-*/
+/**
+ * @brief Updates the vertical velocity of player to simulate gravity
+ * 
+ * @param player Flax will be mutated
+ * @param dt The time passed since this function was last
+ * called. Will probably be "game time" between frames
+ */
 void perform_gravity(Flax *player, float dt) {
 	player->vel += dt * player_gravity;
 	if ( player->vel < player_vel_limit_down ) {
@@ -53,14 +54,14 @@ void perform_gravity(Flax *player, float dt) {
 	}
 };
 
-/* function move_player
-move the player by its own velocity.
 
-Argument player: the instance of Flax representing the player,
-will be mutated
-
-Argument dt: time that has passed
-*/
+/**
+ * @brief Moves the player by its own velocity
+ * 
+ * @param player Flax will be mutated
+ * @param dt The time passed since this function was last
+ * called. Will probably be "game time" between frames
+ */
 void move_player(Flax *player, float dt) {
 	float y = player->y + player->vel * dt;
 
@@ -72,6 +73,12 @@ void move_player(Flax *player, float dt) {
 	}
 };
 
+/**
+ * @brief Draws Flax
+ * 
+ * @param player Flax
+ * @param screen the screen array
+ */
 void draw_player(Flax *player, uint8_t screen[32][128]) {
 	uint8_t x = (uint8_t) player->x;
 	uint8_t y = MAX_Y - (uint8_t) player->y; // low indexes are top of screen
@@ -86,16 +93,15 @@ void draw_player(Flax *player, uint8_t screen[32][128]) {
 	}
 };
 
-/*
-Generate random numbers, and create a pipe out of that information.
-
-Args:
-	*pipes: array containing the pipes
-	*pipes_len: can be modified
-	movement_type: type of pipe
-	speed: only applicable for non static movement type
-	x: the x coordinate of the left side of the pipe
-*/
+/**
+ * @brief Randomly generate pipes
+ * 
+ * @param pipes Array containing the pipes
+ * @param pipes_len Length of the pipe array, can be modified 
+ * @param movement_type Type of pipe
+ * @param speed Only applicable for non static movement type
+ * @param x The x coordinate of the left side of the pipe
+ */
 void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type, float speed, int x) {
 	PipePair pair;
 	pair.left = x;
@@ -167,15 +173,14 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 	pipes[*pipes_len-1] = pair;
 }
 
-/* function move_pipes
-move all pipes given speed and time passed
-also delete the first pipe if it is out of frame
-
-args:
-	PipePair *pipes: array pointing to the pipes
-	int *pipes_len: len of the array
-	float dt: the time that has passed
-*/
+/**
+ * @brief Move all pipes given speed and time passed
+ * also delete the first pipe if it is out of frame
+ * 
+ * @param pipes array pointing to the pipes
+ * @param pipes_len amount of pipes, can be modified
+ * @param dt The time that has passed
+ */
 void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 	for (int i=0; i < *pipes_len; ++i) {
 		// vertical movement
@@ -225,6 +230,13 @@ void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 	}
 }
 
+/**
+ * @brief Draw all pipes on screen
+ * 
+ * @param pipes The array of pipes
+ * @param pipes_len Amount of pipes
+ * @param screen The array representing the screen
+ */
 void draw_pipes(PipePair *pipes, int pipes_len, uint8_t screen[32][128]) {
 	for (int i=0; i<pipes_len; ++i) {
 		int left = (int) pipes[i].left;
@@ -254,22 +266,19 @@ void draw_pipes(PipePair *pipes, int pipes_len, uint8_t screen[32][128]) {
 	}
 }
 
-/* function flax_hits_pipe
-returns 1 if the player has hit one of the pipes,
-otherwise false.
-
-Flax hitbox is 3x1:
---------
---xxx---
---------
-
-None of the arguments are mutated
-*/
-int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
+/**
+ * @brief determine if player has any of the pipes
+ * 
+ * @param player Flax
+ * @param pipes array containing the pipes
+ * @param pipes_len len of pipes
+ * @return int 1 if the player has hit a pipe, else 0
+ */
+int flax_hits_pipe(Flax player, PipePair *pipes, int pipes_len) {
 	for ( int i = 0; i < pipes_len; ++i ) {
 		if (
-			(player.y < pipe[i].lower+1 || player.y > pipe[i].upper-1) 
-			&& (player.x - 1 < pipe[i].right+1 && player.x + 1 > pipe[i].left-1)
+			(player.y < pipes[i].lower+1 || player.y > pipes[i].upper-1) 
+			&& (player.x - 1 < pipes[i].right+1 && player.x + 1 > pipes[i].left-1)
 		) {
 			return 1;
 		}
@@ -277,17 +286,13 @@ int flax_hits_pipe(Flax player, PipePair *pipe, int pipes_len) {
 	return 0;
 }
 
-// used in update_game for determining when to update highscore
-int passed_pipe = 0;
-
-/* function update_game
-updates the game state.
-args:
-	Game *game,
-	flaot dt (time passsed),
-return: 
-	1 if game over, else 0.
-*/
+/**
+ * @brief updates the game state, given the time that has passed 
+ * 
+ * @param game The game struct
+ * @param dt time that has passed since last update
+ * @return 1 if game over, else 0
+ */
 int update_game(Game *game, float dt) {
 	perform_gravity(&game->player, dt);
 	move_player(&game->player, dt);
@@ -308,6 +313,11 @@ int update_game(Game *game, float dt) {
 	return 0;
 }
 
+/**
+ * @brief Set the default game state struct
+ * 
+ * @param game The game struct
+ */
 void set_default_game_state(Game *game) {
 	game->player.x = PLAYER_START_X;
 	game->player.y = PLAYER_START_Y;
@@ -322,6 +332,11 @@ void set_default_game_state(Game *game) {
 	memset(game->screen, 0, 4096);
 }
 
+/**
+ * @brief draw all elements from game
+ * 
+ * @param game The game struct
+ */
 void draw_game(Game *game) {
 	memset(game->screen, 0, 4096);
 	draw_player(&game->player, game->screen);
