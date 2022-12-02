@@ -97,18 +97,15 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 	pair.right = x + PIPE_WIDTH - 1;
 	pair.speed = speed;
 	pair.movement_type = movement_type;
+
+	int max_lower;
 	
 	switch ( movement_type ) {
 		case Uniform:
-			// pair.upper_upper = 24;
-			// pair.upper_lower = 20;
-			// pair.lower_upper = 10;
-			// pair.lower_lower = 6;
-
 			// range [4, 18]
 			pair.lower_upper = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER + 2;
-			// range [2, 16]
-			pair.lower_lower = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER;
+			// range [2, lower_upper]
+			pair.lower_lower = rand() % ((int) pair.lower_upper - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER;
 
 			// range [lower_upper + PIPE_MIN_GAP, 29]
 			pair.upper_upper = rand() % (MAX_Y - (int) pair.lower_upper - PIPE_MIN_GAP - PIPE_MIN_LOWER + 1) + (int) pair.lower_upper + PIPE_MIN_GAP;
@@ -129,13 +126,7 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 		break;
 
 		case Squeezing:
-			// pair.upper_upper = 24;
-			// pair.upper_lower = 20;
-			// pair.lower_upper = 10;
-			// pair.lower_lower = 6;
-
-			int max_lower = (MAX_Y - PIPE_MIN_GAP) / 2;
-
+			max_lower = (MAX_Y - PIPE_MIN_GAP) / 2;
 
 			pair.lower_upper = rand() % (max_lower - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER + 2;
 			pair.upper_lower = MAX_Y - pair.lower_upper;
@@ -316,7 +307,7 @@ void set_default_game_state(Game *game) {
 	game->score = 0;
 
 	for ( int i = 0; i < 4; ++i ) {
-		spawn_pipe(game->pipes, &game->pipes_len, Static, DEFAULT_DYNAMIC_PIPE_SPEED, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
+		spawn_pipe(game->pipes, &game->pipes_len, Squeezing, DEFAULT_DYNAMIC_PIPE_SPEED, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
 	}
 
 	memset(game->screen, 0, 4096);
