@@ -19,6 +19,27 @@
 #define HIGHSCORES_LEN 20
 #define PLAYER_NAME_LEN 8
 
+#define DEFAULT_DYNAMIC_PIPE_SPEED 3
+
+enum PipeMovementType {
+	Static,
+	Squeezing,
+	Uniform
+};
+typedef enum PipeMovementType PipeMovementType;
+
+/* enum Direction
+Used for telling which direction pipes are currently moving (vertically)
+*/
+enum Direction {
+	In,
+	Out,
+	Up,
+	Down,
+	Still
+};
+typedef enum Direction Direction;
+
 enum GameState {
 	MainMenu,
 	HighScoreMenu,
@@ -43,11 +64,28 @@ typedef struct Flax Flax;
    left_border
          right_border
 */
+// struct PipePair {
+// 	float left_border;
+// 	float right_border;
+// 	float upper_edge;
+// 	float lower_edge;
+// };
+// typedef struct PipePair PipePair;
+
 struct PipePair {
-	float left_border;
-	float right_border;
-	float upper_edge;
-	float lower_edge;
+	float left;
+	float right;
+	float upper;
+	float lower;
+
+	float upper_upper;
+	float upper_lower;
+	float lower_upper;
+	float lower_lower;
+
+	PipeMovementType movement_type;
+	Direction direction;
+	float speed;
 };
 typedef struct PipePair PipePair;
 
@@ -70,5 +108,5 @@ typedef struct Highscore Highscore;
 void jump(Flax *player);
 int update_game(Game *game, float dt);
 void draw_game(Game *game);
-void spawn_pipe(PipePair *pipes, int *pipes_len, int x);
+void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type, float speed, int x);
 void set_default_game_state(Game *game);

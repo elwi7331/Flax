@@ -141,8 +141,8 @@ int main(void) {
 				display_image(img_data);
 				write_led(game.score);
 
-				if ( game.pipes[game.pipes_len-1].right_border < MAX_X - PIPE_SPACING ) {
-					spawn_pipe(game.pipes, &game.pipes_len, MAX_X);
+				if ( game.pipes[game.pipes_len-1].right< MAX_X - PIPE_SPACING ) {
+					spawn_pipe(game.pipes, &game.pipes_len, Static, DEFAULT_DYNAMIC_PIPE_SPEED, MAX_X);
 				}
 				
 				if ( btn4 ) {
