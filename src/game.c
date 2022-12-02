@@ -2,6 +2,7 @@
 #include <string.h>
 #include "game.h"
 #include <stdlib.h>
+#include "random.h"
 
 
 #define PIPE_MIN_GAP 9
@@ -18,6 +19,10 @@ const float pipe_speed = - 3;
 
 // make stdlib work...
 void *stdout = (void *) 0;
+
+uint32_t randrng(uint32_t lower, uint32_t upper) {
+	return lower + rand() % (upper - lower + 1);
+}
 
 /* function jump
 update the vertical velocity of player
@@ -91,7 +96,7 @@ Args:
 	speed: only applicable for non static movement type
 	x: the x coordinate of the left side of the pipe
 */
-void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type, float speed, int x) { // TODO seed random...
+void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type, float speed, int x) {
 	PipePair pair;
 	pair.left = x;
 	pair.right = x + PIPE_WIDTH - 1;
@@ -103,12 +108,16 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 	switch ( movement_type ) {
 		case Uniform:
 			// range [4, 18]
-			pair.lower_upper = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER + 2;
+			// pair.lower_upper = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER + 2;
+			pair.lower_upper = randrng(PIPE_MIN_LOWER + 2, PIPE_MAX_LOWER);
+
 			// range [2, lower_upper]
-			pair.lower_lower = rand() % ((int) pair.lower_upper - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER;
+			// pair.lower_lower = rand() % ((int) pair.lower_upper - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER;
+			pair.lower_lower = randrng(PIPE_MIN_LOWER, (int) pair.lower_upper);
 
 			// range [lower_upper + PIPE_MIN_GAP, 29]
-			pair.upper_upper = rand() % (MAX_Y - (int) pair.lower_upper - PIPE_MIN_GAP - PIPE_MIN_LOWER + 1) + (int) pair.lower_upper + PIPE_MIN_GAP;
+			// pair.upper_upper = rand() % (MAX_Y - (int) pair.lower_upper - PIPE_MIN_GAP - PIPE_MIN_LOWER + 1) + (int) pair.lower_upper + PIPE_MIN_GAP;
+			pair.upper_upper = randrng( (int) pair.lower_upper + PIPE_MIN_GAP, MAX_Y - PIPE_MIN_LOWER );
 			// same movement range as lower pipe
 			pair.upper_lower = pair.upper_upper - (pair.lower_upper - pair.lower_lower);
 
@@ -307,7 +316,7 @@ void set_default_game_state(Game *game) {
 	game->score = 0;
 
 	for ( int i = 0; i < 4; ++i ) {
-		spawn_pipe(game->pipes, &game->pipes_len, Squeezing, DEFAULT_DYNAMIC_PIPE_SPEED, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
+		spawn_pipe(game->pipes, &game->pipes_len, Uniform, DEFAULT_DYNAMIC_PIPE_SPEED, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
 	}
 
 	memset(game->screen, 0, 4096);

@@ -41,10 +41,11 @@ enum Direction {
 typedef enum Direction Direction;
 
 enum GameState {
+	StartMenu,
 	MainMenu,
 	HighScoreMenu,
 	Playing,
-	GameOver 
+	GameOver
 };
 typedef enum GameState GameState;
 

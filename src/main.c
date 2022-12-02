@@ -65,7 +65,7 @@ int highscore_cmp(const void *a, const void *b) {
 }
 
 // global variables for entering highscore information
-char player_name[PLAYER_NAME_LEN] = "_      \0";
+char player_name[PLAYER_NAME_LEN] = "_      ";
 int ch_idx = 0;
 
 Highscore highscores[HIGHSCORES_LEN];
@@ -75,6 +75,9 @@ int highscores_idx = 0;
 int light = 0;
 
 int main(void) {
+	uint32_t seed_counter = 0;
+
+	// rand_seed(1337);
 
 	// some highscores ----
 	highscores[0].score = 10;
@@ -107,8 +110,7 @@ int main(void) {
 	float dt = 1.0 / 25.0;
 
 	Game game;
-	set_default_game_state(&game);
-	game.state = MainMenu;
+	game.state = StartMenu;
 	
 	halted = 1;
 	
@@ -118,6 +120,27 @@ int main(void) {
 	
 	while( 1 ) {
 		switch(game.state) {
+			case StartMenu:
+				display_string(0, "    ^ Flax ^");
+				display_string(1, "");
+				display_string(2, "BTN4 > play");
+				display_string(3, "BTN3 > scores");
+				display_update(light);
+
+				seed_counter += 4711;
+				
+				if ( btn4 ) {
+					set_timer_period(GAME_TIME_PERIOD);
+					game.state = Playing;
+					srand(seed_counter);
+				} else if ( btn3 ) {
+					game.state = HighScoreMenu;
+					srand(seed_counter);
+				}
+
+				set_default_game_state(&game);
+				break;
+
 			case MainMenu:
 				display_string(0, "    ^ Flax ^");
 				display_string(1, "");
@@ -222,12 +245,12 @@ int main(void) {
 
 					if ( updated == 0 ) {
 						++highscore_len;
-						strcpy(highscores[highscore_len-1].name, player_name);
+						memcpy(highscores[highscore_len-1].name, player_name, PLAYER_NAME_LEN);
 						highscores[highscore_len-1].score = game.score;
 						qsort(highscores, highscore_len, sizeof(Highscore), highscore_cmp);
 					}
 
-					strcpy(player_name, (const char*) &"_      \0");
+					memcpy(player_name, (const char*) &"_      ", PLAYER_NAME_LEN);
 
 					set_default_game_state(&game);
 					write_led(0);
