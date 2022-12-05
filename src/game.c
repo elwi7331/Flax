@@ -13,7 +13,6 @@
 const float player_vel_limit_down = -20;
 const float player_jump_vel = 12;
 const float player_gravity = -20.0;
-const float pipe_speed = - 3;
 
 void *stdout = (void*) 0; // is needed when stdio is not included
 int passed_pipe = 0; // used in update_game for determining when to update highscore
@@ -181,7 +180,7 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
  * @param pipes_len amount of pipes, can be modified
  * @param dt The time that has passed
  */
-void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
+void move_pipes(PipePair *pipes, int *pipes_len, float horizontal_speed, float dt) {
 	for (int i=0; i < *pipes_len; ++i) {
 		// vertical movement
 		
@@ -218,8 +217,8 @@ void move_pipes(PipePair *pipes, int *pipes_len, float dt) {
 		}
 
 		// horizontal movement
-		pipes[i].left+= pipe_speed * dt;
-		pipes[i].right+= pipe_speed * dt;
+		pipes[i].left+= horizontal_speed * dt;
+		pipes[i].right+= horizontal_speed * dt;
 	}
 	
 	if ( pipes[0].right < 0 ) { // remove first pipe (out of frame) 
@@ -294,9 +293,15 @@ int flax_hits_pipe(Flax player, PipePair *pipes, int pipes_len) {
  * @return 1 if game over, else 0
  */
 int update_game(Game *game, float dt) {
+	int pipe_speed;
+	int moving_pipe_probability;
+	
+	uint8_t score = game->score;
+	pipe_speed = -3 -0.5*score;
+
 	perform_gravity(&game->player, dt);
 	move_player(&game->player, dt);
-	move_pipes(game->pipes, &game->pipes_len, dt);
+	move_pipes(game->pipes, &game->pipes_len, pipe_speed, dt);
 	if (flax_hits_pipe(game->player, game->pipes, game->pipes_len)) {
 		return 1;
 	} else if ( game->player.y < 0 ) {
@@ -310,6 +315,27 @@ int update_game(Game *game, float dt) {
 		game->score++;
 		passed_pipe = 1;
 	}
+
+	// spawn a new pipe
+	if ( game->pipes[game->pipes_len-1].right < MAX_X - PIPE_SPACING ) {
+		moving_pipe_probability = 20 + 5 * (score / 2);
+
+		int rand = randrng(1, 100);
+		PipeMovementType pipe_type;
+
+		if ( rand <= moving_pipe_probability ) {
+			if ( randrng(0,1) == 0 ) {
+				pipe_type = Squeezing;
+			} else {
+				pipe_type = Uniform;
+			}
+		} else {
+			pipe_type = Static;
+		}
+
+		spawn_pipe(game->pipes, &game->pipes_len, pipe_type, DEFAULT_DYNAMIC_PIPE_SPEED, MAX_X);
+	}
+
 	return 0;
 }
 
@@ -326,7 +352,7 @@ void set_default_game_state(Game *game) {
 	game->score = 0;
 
 	for ( int i = 0; i < 4; ++i ) {
-		spawn_pipe(game->pipes, &game->pipes_len, Uniform, DEFAULT_DYNAMIC_PIPE_SPEED, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
+		spawn_pipe(game->pipes, &game->pipes_len, Static, DEFAULT_DYNAMIC_PIPE_SPEED, PIPE_START_X + i*(PIPE_SPACING + PIPE_WIDTH));
 	}
 
 	memset(game->screen, 0, 4096);

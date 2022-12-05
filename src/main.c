@@ -170,10 +170,6 @@ int main( void ) {
 				image_to_data(game.screen, img_data, light);
 				display_image(img_data);
 				write_led(game.score);
-
-				if ( game.pipes[game.pipes_len-1].right< MAX_X - PIPE_SPACING ) {
-					spawn_pipe(game.pipes, &game.pipes_len, Static, DEFAULT_DYNAMIC_PIPE_SPEED, MAX_X);
-				}
 				
 				if ( btn4 ) {
 					jump(&game.player);
