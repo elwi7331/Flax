@@ -45,7 +45,7 @@ enum GameState {
 	MainMenu,
 	HighScoreMenu,
 	Playing,
-	GameOver
+	EnterHighscore
 };
 typedef enum GameState GameState;
 
@@ -111,3 +111,4 @@ int update_game(Game *game, float dt);
 void draw_game(Game *game);
 void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type, float speed, int x);
 void set_default_game_state(Game *game);
+uint32_t randrng(uint32_t lower, uint32_t upper);

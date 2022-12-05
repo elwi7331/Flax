@@ -82,6 +82,15 @@ int main( void ) {
 	int highscores_idx = 0;
 	memset(highscores, 0, HIGHSCORES_LEN*sizeof(Highscore));
 
+	const char highscore_names[5][8] = {
+		"podobas",
+		"glassey",
+		"branden",
+		"ekola  ",
+		"kann   "
+	};
+	const int highscore_names_len = 5;
+
 	// boolean values for whether button is pressed or not
 	int btn2 = 0, btn3 = 0, btn4 = 0;
 
@@ -180,7 +189,7 @@ int main( void ) {
 						game.state = MainMenu;
 						set_default_game_state(&game);
 					} else {
-						game.state = GameOver;
+						game.state = EnterHighscore;
 					}
 
 					set_timer_period(MENU_TIME_PERIOD);
@@ -188,7 +197,7 @@ int main( void ) {
 
 				break;
 
-			case GameOver:
+			case EnterHighscore:
 				display_string(0, "   Enter name");
 				display_string(1, player_name);
 				display_string(2, "btn 4  3   2");
@@ -229,6 +238,11 @@ int main( void ) {
 						player_name[ch_idx] = ' ';
 					} else if ( player_name[ch_idx] >= 65 && player_name[ch_idx] <= 90 ) { // fix upper case letter
 						player_name[ch_idx] += 32;
+					}
+					
+					if ( strcmp(player_name, "       ") == 0 ) {
+						int index = randrng(0, highscore_names_len - 1);
+						memcpy(player_name, highscore_names[index], PLAYER_NAME_LEN);
 					}
 
 					ch_idx = 0;
@@ -291,6 +305,7 @@ int main( void ) {
 				} else if ( btn3 && highscores_idx > 0 ) {
 					highscores_idx -= 3;
 				} else if ( btn4 ) {
+					highscores_idx = 0;
 					game.state = MainMenu;
 				}
 				
