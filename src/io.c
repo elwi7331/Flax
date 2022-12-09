@@ -14,7 +14,10 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "boilerplate.h"  /* Declatations for these labs */
 
-/* Interrupt Service Routine */
+
+/**
+ * @brief Interrupt Service Routine
+ */
 void user_isr() {
 	if (IFS(0) & 0x100) {
 		IFS(0) &= ~0x100;
@@ -22,10 +25,11 @@ void user_isr() {
 	} 
 }
 
-/*IO initialization 
-note that this function initializes the timer, but not the timer period.
-This is up to the developer to do, using set_timer_period
-*/
+/**
+ * @brief IO initialization. Note that this function 
+ * initializes the timer, but not the timer period.
+ * This is up to the developer to do, using set_timer_period.
+ */
 void io_init() {
 	// io 
 	TRISE &= ~0xff; // set as outputs
@@ -43,39 +47,38 @@ void io_init() {
 	IPC(2) = 4; // priority control
 	IEC(0) = (1 << 8); // interrupt enable
 	
-	// TODO wat?
-	// enable interrupts for sw2
-	IEC(0) |= 0b100000000000; // enable
-	IPC(2) = (IPC(2) & 0xE3FFFFFF) | (6 << 26);
-	IPC(2) = (IPC(2) & 0xFAFFFFFF) | (1 << 24); 
-
 	enable_interrupt();
 }
 
-/* function set_timer_period
-set period of the built in timer pr2.
-*/
+/**
+ * @brief Set period of the built in timer pr2.
+ * @param period is the time period
+ */
 void set_timer_period(uint16_t period) {
 	PR2 = period;
 }
 
+/**
+ * @brief Get state of the switches.
+ * @return int state
+ */
 int getsw() {
 	return (PORTD >> 8) & 0xf;
 }
 
+/**
+ * @brief Get state of the buttons
+ * @return int state
+ */
 int getbtns() {
 	return (PORTD >> 5) & 0b111;
 }
 
-int timertest() {
-	if (IFS(0) & 0x100) {
-		IFS(0) = 0;
-		return 1;
-	}
-
-	return 0;
-}
-
+/**
+ * @brief Determines if a button is currently pressed down
+ * @param btn specifies which button to check
+ * @return int 1 if button btn is pressed, else 0
+ */
 int btn_is_pressed(int btn) {
 	int btns = getbtns();
 	switch (btn) {
@@ -88,6 +91,11 @@ int btn_is_pressed(int btn) {
 	};
 }
 
+/**
+ * @brief Determines if a switch is currently toggled
+ * @param sw specifies which switch to check
+ * @return int 1 if switch is toggled, else 0
+ */
 int sw_is_toggled(int sw) {
 	int swtchs = getsw();
 	switch (sw) {
@@ -102,6 +110,10 @@ int sw_is_toggled(int sw) {
 	}
 }
 
+/**
+ * @brief write to the leds on the io shield.
+ * @param num byte of binary values to write
+ */
 void write_led(uint8_t num) {
 	PORTE = num;
 }

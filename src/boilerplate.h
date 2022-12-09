@@ -7,14 +7,12 @@
 
    For copyright and licensing, see file COPYING */
 
-/* Declare display-related functions from mipslabfunc.c */
-void image_to_data(uint8_t image[32][128], uint8_t *data, int light);
+/* Display related functions */
 void display_image(uint8_t *data);
 void display_init(void);
 void display_string(int line, char *s);
 void display_update(int light);
 uint8_t spi_send_recv(uint8_t data);
-void io_init();
 
 /* Declare lab-related functions from mipslabfunc.c */
 char * itoaconv( int num );
@@ -38,12 +36,8 @@ extern const uint8_t const font[128*8];
 /* Declare text buffer for display output */
 extern char textbuffer[4][16];
 
-/* Declare functions written by students.
-   Note: Since we declare these functions here,
-   students must define their functions with the exact types
-   specified in the laboratory instructions. */
-/* Written as part of asm lab: delay, time2string */
-/* Written as part of i/o lab: getbtns, getsw, enable_interrupt */
+void image_to_data(uint8_t image[32][128], uint8_t *data, int light);
+void io_init();
 int sw_is_toggled(int);
 int btn_is_pressed(int);
 int getsw(void);

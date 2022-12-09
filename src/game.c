@@ -113,15 +113,12 @@ void spawn_pipe(PipePair *pipes, int *pipes_len, PipeMovementType movement_type,
 	switch ( movement_type ) {
 		case Uniform:
 			// range [4, 18]
-			// pair.lower_upper = rand() % (PIPE_MAX_LOWER - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER + 2;
 			pair.lower_upper = randrng(PIPE_MIN_LOWER + 2, PIPE_MAX_LOWER);
 
 			// range [2, lower_upper]
-			// pair.lower_lower = rand() % ((int) pair.lower_upper - PIPE_MIN_LOWER + 1 - 2) + PIPE_MIN_LOWER;
 			pair.lower_lower = randrng(PIPE_MIN_LOWER, (int) pair.lower_upper);
 
 			// range [lower_upper + PIPE_MIN_GAP, 29]
-			// pair.upper_upper = rand() % (MAX_Y - (int) pair.lower_upper - PIPE_MIN_GAP - PIPE_MIN_LOWER + 1) + (int) pair.lower_upper + PIPE_MIN_GAP;
 			pair.upper_upper = randrng( (int) pair.lower_upper + PIPE_MIN_GAP, MAX_Y - PIPE_MIN_LOWER );
 			// same movement range as lower pipe
 			pair.upper_lower = pair.upper_upper - (pair.lower_upper - pair.lower_lower);
@@ -297,11 +294,15 @@ int update_game(Game *game, float dt) {
 	int moving_pipe_probability;
 	
 	uint8_t score = game->score;
-	pipe_speed = -3 -0.5*score;
+	// calculate the pipe_speed from the player score. Speed gets higher as game goes on
+	pipe_speed = -3 -0.5*score; 
 
+	// various updates
 	perform_gravity(&game->player, dt);
 	move_player(&game->player, dt);
 	move_pipes(game->pipes, &game->pipes_len, pipe_speed, dt);
+	
+	// handle Flax collisions with pipes and ground
 	if (flax_hits_pipe(game->player, game->pipes, game->pipes_len)) {
 		return 1;
 	} else if ( game->player.y < 0 ) {
@@ -309,14 +310,16 @@ int update_game(Game *game, float dt) {
 		return 1;
 	}
 
+	// Flax x position is within a pipe pair's boundaries
 	if (game->player.x > game->pipes[0].left && game->player.x < game->pipes[0].right) {
 		passed_pipe = 0;
+	// Flax has just passed a pipe pair
 	} else if ( game->pipes[0].right < game->player.x && passed_pipe == 0) {
 		game->score++;
 		passed_pipe = 1;
 	}
 
-	// spawn a new pipe
+	// spawn a new pipe if the rightmost pipe has moved enough to the left
 	if ( game->pipes[game->pipes_len-1].right < MAX_X - PIPE_SPACING ) {
 		moving_pipe_probability = 20 + 5 * (score / 2);
 

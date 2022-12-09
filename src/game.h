@@ -28,9 +28,9 @@ enum PipeMovementType {
 };
 typedef enum PipeMovementType PipeMovementType;
 
-/* enum Direction
-Used for telling which direction pipes are currently moving (vertically)
-*/
+/**
+ * @brief Used for telling which direction pipes are currently moving (vertically)
+ */
 enum Direction {
 	In,
 	Out,
@@ -58,21 +58,13 @@ typedef struct Flax Flax;
 
 /*
 ---|-----|------
----x=====x------ y = upper_edge
+---x=====x------ y = upper
 ----------------
----x=====x------ y = lower_edge
+---x=====x------ y = lower
 ---|-----|------
-   left_border
-         right_border
+  left
+        right
 */
-// struct PipePair {
-// 	float left_border;
-// 	float right_border;
-// 	float upper_edge;
-// 	float lower_edge;
-// };
-// typedef struct PipePair PipePair;
-
 struct PipePair {
 	float left;
 	float right;

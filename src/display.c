@@ -106,16 +106,16 @@ void display_string(int line, char *s) {
 			textbuffer[line][i] = ' ';
 }
 
-/*
-	image_to_data
-	convert a image represented by a 2d array of 1's and 0's to
-	a 512 long array of bytes. The resulting representation
-	can be used in display_image.
-
-	image: 2d array representing the screen.
-	data: this is were the result is stored. 512 length,
-	elements are bytes representing 8 pixels each.
-*/
+/**
+ * @brief Convert a image represented by a 2d array of 1's and 0's to
+ * a 512 long array of bytes. The resulting representation
+ * can be used in display_image.
+ * 
+ * @param image 2d array representing the screen
+ * @param data this is were the result is stored. 512 length,
+ * elements are bytes representing 8 pixels each
+ * @param light 1 for light mode, else 0 
+ */
 void image_to_data(uint8_t image[32][128], uint8_t *data, int light) {
 	int x, y;
 	uint8_t byte;
@@ -141,19 +141,16 @@ void image_to_data(uint8_t image[32][128], uint8_t *data, int light) {
 	}
 }
 
-/*
-	display_image
-	display an image on screen from array
-
-	*data has length 512
-	each int in data represents 8 pixels on top of each other.
-	Most significant bit is the one on the bottom, and the least significant
-	bit is on top of the column.
-
-	The 8 high columns are printed in horizontal order, from left to right.
-	When end of screen is reached, the next row is printed.
-	As the resolution is 32*128, there are four "rows".
-*/
+/**
+ * @brief Display an image on screen from array.
+ * The 8 high columns are printed in horizontal order, from left to right.
+ * When end of screen is reached, the next row is printed.
+ * As the resolution is 32*128, there are four "rows".
+ * 
+ * @param data has length 512. Each int in data represents 8 pixels on top of each other.
+ * Most significant bit is the one on the bottom, and the least significant
+ * bit is on top of the column.
+ */
 void display_image(uint8_t *data) {
 	int i, j, offset;
 	
@@ -174,8 +171,11 @@ void display_image(uint8_t *data) {
 		}
 }
 
-// print text to screen
-// seems to clear the display also...
+/**
+ * @brief Print text to screen.
+ * 
+ * @param light 1 if light mode, 0 for dark mode
+ */
 void display_update(int light) {
 	int i, j, k;
 	int c;
@@ -208,8 +208,7 @@ void display_update(int light) {
 
 /* Helper function, local to this file.
    Converts a number to hexadecimal ASCII digits. */
-static void num32asc( char * s, int n ) // TODO remove
-{
+static void num32asc( char * s, int n ) {
   int i;
   for( i = 28; i >= 0; i -= 4 )
     *s++ = "0123456789ABCDEF"[ (n >> i) & 15 ];
@@ -262,8 +261,7 @@ static void num32asc( char * s, int n ) // TODO remove
  * may not allow this straight away.
  */
 #define ITOA_BUFSIZ ( 24 )
-char * itoaconv( int num )
-{
+char * itoaconv( int num ) {
   register int i, sign;
   static char itoa_buffer[ ITOA_BUFSIZ ];
   static const char maxneg[] = "-2147483648";
